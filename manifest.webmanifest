@@ -1,0 +1,26 @@
+{
+  "id": "./",
+  "name": "كوليكار — أرسل كوليك مع الكار",
+  "short_name": "كوليكار",
+  "description": "أرسل طرودك بين الولايات مع سائقي حافلات موثّقين، برموز أمان للاستلام والتسليم، وتتبّع خطوة بخطوة.",
+  "lang": "ar",
+  "dir": "rtl",
+  "start_url": "./",
+  "scope": "./",
+  "display": "standalone",
+  "orientation": "portrait",
+  "background_color": "#EEF2F7",
+  "theme_color": "#EEF2F7",
+  "categories": ["business", "travel", "utilities"],
+  "icons": [
+    { "src": "icon-192.png", "sizes": "192x192", "type": "image/png", "purpose": "any" },
+    { "src": "icon-512.png", "sizes": "512x512", "type": "image/png", "purpose": "any" },
+    { "src": "maskable-192.png", "sizes": "192x192", "type": "image/png", "purpose": "maskable" },
+    { "src": "maskable-512.png", "sizes": "512x512", "type": "image/png", "purpose": "maskable" }
+  ],
+  "shortcuts": [
+    { "name": "أرسل طرداً", "url": "./#send", "icons": [{ "src": "icon-192.png", "sizes": "192x192" }] },
+    { "name": "تتبّع طرداً", "url": "./#track", "icons": [{ "src": "icon-192.png", "sizes": "192x192" }] },
+    { "name": "طرود الخط (للسائق)", "url": "./#driver", "icons": [{ "src": "icon-192.png", "sizes": "192x192" }] }
+  ]
+}
