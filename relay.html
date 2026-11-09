@@ -1,0 +1,35 @@
+<!doctype html>
+<html lang="ar" dir="rtl"><head><meta charset="utf-8"><meta name="robots" content="noindex"><title>Kolicar relay</title></head>
+<body style="font:16px system-ui;padding:24px">
+<p id="s">…</p>
+<script>
+/* صفحة مؤقتة: تنقل ملف التطبيق من نافذة PWABuilder إلى صفحة الرفع في GitHub، ثم تُحذف. */
+(function(){
+  var S=document.getElementById('s');
+  function say(t){S.textContent=t}
+  var PWA='https://www.pwabuilder.com', GH='https://github.com';
+  var DB='kolicar-relay', ST='f', KEY='apk';
+  function db(){return new Promise(function(res,rej){var r=indexedDB.open(DB,1);r.onupgradeneeded=function(){r.result.createObjectStore(ST)};r.onsuccess=function(){res(r.result)};r.onerror=function(){rej(r.error)}})}
+  function tx(mode,fn){return db().then(function(d){return new Promise(function(res,rej){var t=d.transaction(ST,mode),q=fn(t.objectStore(ST));t.oncomplete=function(){res(q&&q.result)};t.onerror=t.onabort=function(){rej(t.error)}})})}
+  var op=window.opener, mode=location.hash.slice(1);
+  if(!op){say('no opener');return}
+  function bye(){setTimeout(function(){try{window.close()}catch(e){}},1500)}
+  if(mode==='in'){
+    addEventListener('message',function(e){
+      if(e.origin!==PWA||e.source!==op||!e.data||!(e.data.buf instanceof ArrayBuffer))return;
+      var rec={name:String(e.data.name||'kolicar.apk'),type:String(e.data.type||''),buf:e.data.buf};
+      tx('readwrite',function(st){return st.put(rec,KEY)}).then(function(){
+        say('stored '+rec.buf.byteLength);op.postMessage({relay:'stored',size:rec.buf.byteLength},PWA);bye();
+      },function(err){op.postMessage({relay:'error',error:String(err)},PWA)});
+    });
+    op.postMessage({relay:'ready'},PWA);say('ready');
+  }else if(mode==='out'){
+    tx('readonly',function(st){return st.get(KEY)}).then(function(rec){
+      if(!rec){op.postMessage({relay:'empty'},GH);say('empty');return}
+      op.postMessage({relay:'file',name:rec.name,type:rec.type,buf:rec.buf},GH);say('sent '+rec.buf.byteLength);
+      return tx('readwrite',function(st){return st.delete(KEY)}).then(bye);
+    }).catch(function(err){op.postMessage({relay:'error',error:String(err)},GH)});
+  }
+})();
+</script>
+</body></html>
