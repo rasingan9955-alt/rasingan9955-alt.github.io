@@ -397,6 +397,36 @@ nav.tabs{display:grid;margin:0 12px 12px;padding:6px;background:var(--surface);b
 .btn[disabled],.btn.is-busy{opacity:.6;pointer-events:none}
 .code-big{font-size:2.4rem;font-weight:600;letter-spacing:.18em;direction:ltr;text-align:center;color:var(--primary);background:var(--surface-2);border-radius:18px;padding:14px}
 .shot{font-size:.94rem;font-weight:500;color:var(--warn);background:var(--amber-soft);border-radius:14px;padding:10px 14px}
+/* v2: notifications, departure times, promo codes, invites */
+.bell{display:flex;gap:12px;align-items:flex-start;background:var(--surface);border-radius:var(--r);padding:16px 18px;box-shadow:var(--shadow)}
+.bell>.ic{color:var(--primary);width:28px;height:28px;margin-top:2px}
+.bell-body{display:flex;flex-direction:column;align-items:flex-start;gap:10px;min-width:0;flex:1}
+.bell-body p{font-size:.98rem;color:var(--ink-2);line-height:1.6}
+.bell.on{background:var(--surface-2);box-shadow:none;padding:12px 16px}
+.bell.on>.ic{color:var(--ok)}
+.sheet .bell,.card .bell{background:var(--surface-2);box-shadow:none}
+.bell-slot:empty,#deps-box:empty{display:none}
+.deps{display:flex;flex-direction:column;gap:6px;font-size:.94rem;color:var(--ink-2)}
+.dep{display:flex;gap:8px;align-items:center}
+.dep .ic{width:20px;height:20px;color:var(--primary)}
+.dep-title{font-weight:600;color:var(--ink)}
+.dep-next{color:var(--ok)}
+.dep-row{display:flex;flex-direction:column;gap:10px;background:var(--surface-2);border-radius:16px;padding:14px}
+.dep-row select,.dep-row input{background:var(--surface)}
+.dep-top{display:grid;grid-template-columns:1fr;gap:10px}
+.dep-top .dep-t{max-width:13em}
+.days{display:flex;flex-wrap:wrap;gap:6px}
+.days .chip{min-height:40px;padding:6px 11px;font-size:.9rem;background:var(--surface)}
+.promo summary{cursor:pointer;color:var(--primary);font-weight:500;padding:4px 0;list-style-position:inside}
+.promo-in{display:flex;flex-direction:column;gap:8px;margin-top:10px}
+.promo-row{display:flex;gap:8px;align-items:stretch}
+.promo-row input{flex:1;min-width:0;direction:ltr;text-align:right;text-transform:uppercase;letter-spacing:.06em}
+.promo-ok{color:var(--ok);font-weight:600;font-size:.95rem}
+.q-old{font-size:.95rem;font-weight:500;color:var(--muted);text-decoration:line-through;margin-inline-end:8px}
+.invite .code-big{font-size:1.9rem}
+#promo-list{box-shadow:none;background:var(--surface-2)}
+.row .r4{grid-column:1/-1}
+.row .r4 .actions{gap:6px}
 @media (prefers-reduced-motion: reduce){*,*::before,*::after{animation:none!important;transition:none!important}}
 </style>
 </head>
@@ -458,7 +488,7 @@ const routeTxt=(f,t)=>`${wn(f)} ← ${wn(t)}`;
 function roadKm(f,t){if(f==t||!W[f]||!W[t])return 0;const a=W[f],b=W[t],R=6371,r=Math.PI/180,dLa=(b.lat-a.lat)*r,dLo=(b.lon-a.lon)*r;const h=Math.sin(dLa/2)**2+Math.cos(a.lat*r)*Math.cos(b.lat*r)*Math.sin(dLo/2)**2;return Math.round(2*R*Math.asin(Math.sqrt(h))*1.3)}
 
 const SIZES={doc:{l:'وثائق',h:'ظرف حتى 1 كغ'},s:{l:'صغير',h:'حتى 5 كغ'},m:{l:'متوسط',h:'حتى 15 كغ'},l:{l:'كبير',h:'حتى 30 كغ'}};
-const DEFAULT_SETTINGS={commission:15,per100:80,base:{doc:300,s:500,m:800,l:1200},rip:'',contactPhone:'',acceptParcels:true,acceptDrivers:true,pauseMsg:'',announce:'',activeWilayas:[],cancelFee:true,bonusPct:0,bonusMin:5000,lowBalance:300,billing:'monthly',dueDay:5,creditLimit:10000};
+const DEFAULT_SETTINGS={commission:15,per100:80,base:{doc:300,s:500,m:800,l:1200},rip:'',contactPhone:'',acceptParcels:true,acceptDrivers:true,pauseMsg:'',announce:'',activeWilayas:[],cancelFee:true,bonusPct:0,bonusMin:5000,lowBalance:300,billing:'monthly',dueDay:5,creditLimit:10000,refBonus:0};
 function priceOf(f,t,size,st){const d=roadKm(f,t);const b=(st.base&&st.base[size])||DEFAULT_SETTINGS.base[size];return Math.max(100,Math.round((b+Math.ceil(d/100)*st.per100)/50)*50)}
 const ST={waiting:{l:'بانتظار سائق',c:'warn'},accepted:{l:'حجزه سائق',c:'info'},picked:{l:'في الطريق',c:'info'},arrived:{l:'وصل إلى المحطة',c:'teal'},delivered:{l:'سُلِّم',c:'ok'},cancelled:{l:'ملغى',c:'mute'}};
 const STEPS=['waiting','accepted','picked','arrived','delivered'];
@@ -502,7 +532,9 @@ const ICON={
   arrowL:'<path d="M19 12H5M11 6l-6 6 6 6"/>',
   gift:'<rect x="4" y="9" width="16" height="11" rx="2"/><path d="M4 13h16M12 9v11"/><path d="M12 9c-1.5-3.5-5-3.5-5-1.2C7 9 9 9 12 9Zm0 0c1.5-3.5 5-3.5 5-1.2C17 9 15 9 12 9Z"/>',
   phone:'<path d="M5.5 4h3.2l1.8 4.6-2.3 1.4a11.5 11.5 0 0 0 5.8 5.8l1.4-2.3 4.6 1.8v3.2a2 2 0 0 1-2.1 2A16.5 16.5 0 0 1 3.5 6.1 2 2 0 0 1 5.5 4Z"/>',
-  safe:'<path d="M12 3 4.5 6v5.5c0 4.6 3.2 8.4 7.5 9.5 4.3-1.1 7.5-4.9 7.5-9.5V6L12 3Z"/>'
+  safe:'<path d="M12 3 4.5 6v5.5c0 4.6 3.2 8.4 7.5 9.5 4.3-1.1 7.5-4.9 7.5-9.5V6L12 3Z"/>',
+  bell:'<path d="M6 16.5V11a6 6 0 0 1 12 0v5.5l1.6 2.2H4.4L6 16.5Z"/><path d="M10 21a2.2 2.2 0 0 0 4 0"/>',
+  clock:'<circle cx="12" cy="12" r="8.5"/><path d="M12 7.5V12l3 2"/>'
 };
 const LOGO=`<g transform="translate(0 3)"><g stroke-linecap="round" fill="none" stroke-width="8">
       <path d="M44 47C31 38 20 32 9 28.5" stroke="#9CBBF4"/>
@@ -525,8 +557,8 @@ const routeLine=(f,t,cls='')=>`<div class="route ${cls}"><span class="stop"><i c
 
 /* ================= server link: every rule is enforced on the server, this phone only shows the result ================= */
 const LS_ME='kolicar.pilot.me',LS_ADM='kolicar.pilot.adm',ROLE_KEY='kolicar.role';
-const emptyData=()=>({parcels:{},drivers:{},topups:{},verify:{},approvals:{},settings:null,admin:false,demoAvailable:false,appUrl:'',sheetUrl:'',driverLost:false});
-const emptyMe=()=>({key:'',driverId:null,sent:{},name:'',phone:'',tracked:[]});
+const emptyData=()=>({parcels:{},drivers:{},topups:{},verify:{},approvals:{},settings:null,admin:false,demoAvailable:false,appUrl:'',sheetUrl:'',driverLost:false,push:'',deps:{},promos:{},backup:null});
+const emptyMe=()=>({key:'',driverId:null,sent:{},name:'',phone:'',tracked:[],push:null});
 const Store={d:emptyData(),me:emptyMe(),ver:'',ready:false,online:true,adm:'',note:'',
   get settings(){const s=this.d.settings||{};return {...DEFAULT_SETTINGS,...s,base:{...DEFAULT_SETTINGS.base,...(s.base||{})}}}
 };
@@ -536,7 +568,7 @@ function lsSet(k,v){try{localStorage.setItem(k,JSON.stringify(v))}catch(e){}}
 function lsDel(k){try{localStorage.removeItem(k)}catch(e){}try{sessionStorage.removeItem(k)}catch(e){}}
 const saveMe=()=>lsSet(LS_ME,Store.me);
 const hasServer=()=>!!(window.google&&google.script&&google.script.run);
-const READS=new Set(['ver','load','track','kyc','photo','checkAdmin']);
+const READS=new Set(['ver','load','track','kyc','photo','checkAdmin','promo']);
 const API=()=>String((window.KOLICAR||{}).api||'').trim();
 /* the usual setup mistakes get a sentence that says exactly what to fix */
 function apiProblem(){
@@ -585,8 +617,199 @@ function applyData(d,ver,sent,force){
   Store.d={...emptyData(),...d};if(ver)Store.ver=ver;Store.ready=true;
   if(sent&&sent.admin&&sent.admin===Store.adm&&!Store.d.admin){Store.adm='';lsDel(LS_ADM);toast('كلمة سر الإدارة تغيّرت. ادخل من جديد.','bad')}
   if(first||was!==Store.d.admin)go(S.route,{keepScroll:true});else refreshLive();
+  maybeSyncPush();
 }
 async function savePatch(patch){const r=await call('settings',{patch});return !!r.ok}
+
+/* ================= notifications: a real bell on the phone, even with the app closed =================
+   The server sends an empty "ring" through the browser's push service; the phone then asks the server
+   for the text (sw.js). Nothing personal ever passes through Google's or Mozilla's push service. */
+const Push={state:'?',ep:'',busy:false};
+const isApp=()=>{try{return matchMedia('(display-mode: standalone)').matches||String(document.referrer).startsWith('android-app://')}catch(e){return false}};
+const pushCapable=()=>'serviceWorker' in navigator&&'PushManager' in window&&'Notification' in window&&!hasServer()&&window.isSecureContext!==false;
+function b64uBytes(v){v=String(v||'').replace(/-/g,'+').replace(/_/g,'/');while(v.length%4)v+='=';const r=atob(v),o=new Uint8Array(r.length);for(let i=0;i<r.length;i++)o[i]=r.charCodeAt(i);return o}
+function bytesB64u(buf){if(!buf)return '';const a=new Uint8Array(buf);let v='';a.forEach(b=>v+=String.fromCharCode(b));return btoa(v).replace(/\+/g,'-').replace(/\//g,'_').replace(/=+$/,'')}
+const shortUA=()=>{const u=navigator.userAgent||'';return ((/Android/.test(u)?'Android':/iPhone|iPad/.test(u)?'iPhone':/Windows/.test(u)?'Windows':/Mac/.test(u)?'Mac':'')+(isApp()?' app':/Firefox\//.test(u)?' Firefox':/Chrome\//.test(u)?' Chrome':/Safari\//.test(u)?' Safari':'')).trim()};
+async function swReg(){
+  if(!pushCapable())return null;
+  let r=null;try{r=await navigator.serviceWorker.getRegistration()}catch(e){}
+  if(!r){try{r=await navigator.serviceWorker.register('sw.js')}catch(e){return null}}
+  try{await Promise.race([navigator.serviceWorker.ready,new Promise(res=>setTimeout(res,8000))])}catch(e){}
+  return r;
+}
+async function currentSub(r){let x=null;try{x=r&&await r.pushManager.getSubscription()}catch(e){}return x}
+/* the subscription must be made with this server's key; a new server key means a new subscription */
+async function freshSub(r){
+  let x=await currentSub(r);
+  if(x){const k=x.options&&x.options.applicationServerKey;if(k&&bytesB64u(k)!==Store.d.push){try{await x.unsubscribe()}catch(e){}x=null}}
+  if(!x)x=await r.pushManager.subscribe({userVisibleOnly:true,applicationServerKey:b64uBytes(Store.d.push)});
+  return x;
+}
+async function pushCheck(){
+  if(!Store.d.push){Push.state='nokey';return Push.state}
+  if(!pushCapable()){Push.state='unsupported';return Push.state}
+  if(Notification.permission==='denied'){Push.state='denied';return Push.state}
+  const x=await currentSub(await swReg());Push.ep=x?x.endpoint:'';
+  Push.state=x&&Notification.permission==='granted'&&Store.me.push&&Store.me.push.ep===x.endpoint?'on':'off';
+  return Push.state;
+}
+const pushSig=()=>[Push.ep,Store.me.driverId||'',Store.adm?'a':''].join('|');
+async function enablePush(o={}){
+  if(Push.busy)return false;
+  if(!Store.d.push){toast('الإشعارات غير مفعّلة في الخادم بعد.','bad');return false}
+  if(!pushCapable()){toast(pushHelp('unsupported'),'bad');return false}
+  Push.busy=true;
+  try{
+    let perm=Notification.permission;
+    if(perm==='default'){try{perm=await Notification.requestPermission()}catch(e){perm=Notification.permission}}
+    if(perm!=='granted'){Push.state=perm==='denied'?'denied':'off';toast(pushHelp(perm==='denied'?'denied':'dismissed'),'bad');renderBells();return false}
+    const r=await swReg();if(!r){toast('تعذر تجهيز الإشعارات على هذا الهاتف. أعد فتح التطبيق ثم حاول.','bad');return false}
+    const x=await freshSub(r);
+    const res=await call('subscribe',{sub:x.toJSON(),origin:location.origin,ua:shortUA(),code:o.code||''},{quiet:true});
+    if(!res.ok){toast(res.net?'تعذر الاتصال. تحقق من الإنترنت ثم أعد المحاولة.':res.error||'تعذر تفعيل الإشعارات.','bad');return false}
+    Push.ep=x.endpoint;Push.state='on';Store.me.push={ep:x.endpoint,sig:pushSig(),codes:((res.result||{}).sub||{}).codes||[]};saveMe();
+    toast(o.code?'سنرسل لك إشعاراً عند كل جديد على هذا الطرد.':'فُعّلت الإشعارات على هذا الهاتف.','ok');
+    renderBells();return true;
+  }catch(e){toast('تعذر تفعيل الإشعارات على هذا الهاتف. '+String((e&&e.message)||e).slice(0,80),'bad');return false}
+  finally{Push.busy=false}
+}
+async function disablePush(){
+  const x=await currentSub(await swReg());
+  if(x){call('unsubscribe',{sub:{endpoint:x.endpoint}},{quiet:true,silent:true});try{await x.unsubscribe()}catch(e){}}
+  Store.me.push=null;saveMe();Push.state='off';Push.ep='';renderBells();toast('أُوقفت الإشعارات على هذا الهاتف.');
+}
+async function testPush(){
+  const r=await call('testPush',{ep:Push.ep},{quiet:true});
+  if(!r.ok){toast(r.net?'تعذر الاتصال. تحقق من الإنترنت.':r.error,'bad');return}
+  const c=(r.pushed||[])[0];
+  if(c>=200&&c<300)toast('أُرسل إشعار تجريبي. يصل خلال ثوانٍ.','ok');
+  else if(c===404||c===410){Store.me.push=null;saveMe();Push.state='off';renderBells();toast('انتهى اشتراك هذا الهاتف. فعّل الإشعارات من جديد.','bad')}
+  else toast('لم تقبل خدمة الإشعارات الطلب'+(c?` (${c})`:'')+'. أعد المحاولة بعد قليل.','bad');
+}
+/* the phone becomes a driver, the owner logs in, or the browser renews the subscription:
+   tell the server, once, which bells this phone should now get */
+let pushSynced='';
+function maybeSyncPush(){const k=(Store.me.driverId||'')+'|'+(Store.adm?'a':'');if(!Store.me.push||!Store.ready||pushSynced===k)return;pushSynced=k;syncPush().then(renderBells,()=>{})}
+async function syncPush(){
+  if(!Store.me.push||!Store.d.push||!pushCapable()||Notification.permission!=='granted')return;
+  const r=await swReg();if(!r)return;
+  let x;try{x=await freshSub(r)}catch(e){return}
+  Push.ep=x.endpoint;
+  if(Store.me.push.ep===x.endpoint&&Store.me.push.sig===pushSig()){Push.state='on';return}
+  const res=await rawCall('subscribe',{...auth(),sub:x.toJSON(),origin:location.origin,ua:shortUA()});
+  if(res.ok){Store.me.push={...Store.me.push,ep:x.endpoint,sig:pushSig()};saveMe();Push.state='on'}
+}
+function pushHelp(st){
+  if(st==='denied')return 'الإشعارات محظورة لكوليكار على هذا الهاتف. افتح الإعدادات ← التطبيقات ← Chrome (أو كوليكار) ← الإشعارات، واسمح بها.';
+  if(st==='dismissed')return 'لم تسمح بالإشعارات. اضغط «فعّل الإشعارات» من جديد ثم «السماح».';
+  return /iPhone|iPad/.test(navigator.userAgent||'')?'على iPhone: افتح كوليكار في Safari، اضغط زر المشاركة ثم «إضافة إلى الشاشة الرئيسية»، وافتحه من هناك لتفعيل الإشعارات.':'هذا المتصفح لا يدعم الإشعارات. افتح كوليكار في Chrome، أو حمّل تطبيق أندرويد.';
+}
+const BELL_TXT={driver:'فعّل الإشعارات لتعرف فور نشر طرد على خطّك، حتى والتطبيق مغلق.',pending:'فعّل الإشعارات لنخبرك فور تفعيل حسابك.',customer:'فعّل الإشعارات لتعرف متى يحجز سائق طردك ومتى يصل، دون أن تفتح التطبيق.',admin:'فعّل التنبيهات على هذا الهاتف: سائق جديد ينتظر التوثيق، دفعة تنتظر التأكيد، طرد جديد.',track:'نبّهني بكل جديد على هذا الطرد، خاصة عند وصوله إلى المحطة.'};
+const bellMem=new WeakMap();
+/* every .bell-slot in the page shows the right prompt for its place: driver, customer, receiver, owner */
+function renderBells(){
+  document.querySelectorAll('.bell-slot').forEach(el=>{
+    const ctx=el.dataset.ctx,code=el.dataset.code||'',st=Push.state,soft=ctx==='customer'||ctx==='track',hideOn=el.dataset.on==='hide';
+    const followed=!code||((Store.me.push||{}).codes||[]).includes(code)||!!(getP(code)||{}).own;
+    let h='';
+    if(st==='unsupported'||st==='denied')h=soft||(hideOn&&st==='unsupported')?'':`<div class="bell">${svg('bell')}<div class="bell-body"><p>${esc(pushHelp(st))}</p></div></div>`;
+    else if(st==='on'&&followed)h=hideOn?'':`<div class="bell on">${svg('bell')}<div class="bell-body"><p><b>الإشعارات مفعّلة</b> على هذا الهاتف.${ctx==='track'?' سنخبرك بكل جديد على هذا الطرد.':''}</p>${ctx==='track'?'':`<div class="actions"><button class="btn sm" data-act="push-test">جرّب إشعاراً</button><button class="btn sm" data-act="push-off">أوقفها</button></div>`}</div></div>`;
+    else if(st==='on'||st==='off')h=`<div class="bell">${svg('bell')}<div class="bell-body"><p>${BELL_TXT[ctx]||BELL_TXT.customer}</p><button class="btn sm primary" data-act="push-on"${code?` data-code="${esc(code)}"`:''}>${ctx==='track'?'نبّهني':'فعّل الإشعارات'}</button></div></div>`;
+    if(bellMem.get(el)!==h){bellMem.set(el,h);el.innerHTML=h}
+  });
+}
+
+/* ================= departure times: when the buses on a line usually leave ================= */
+const DAYS=['الأحد','الإثنين','الثلاثاء','الأربعاء','الخميس','الجمعة','السبت'];
+function depDays(days){const d=(days||[]).slice().sort((a,b)=>a-b),k=d.join(',');if(d.length===7)return 'كل يوم';if(k==='0,1,2,3,4')return 'من الأحد إلى الخميس';if(k==='0,1,2,3,4,6')return 'كل يوم ما عدا الجمعة';if(k==='5,6')return 'الجمعة والسبت';return d.map(x=>DAYS[x]).join('، ')}
+function mergeDeps(l){const seen={},out=[];(l||[]).forEach(e=>{const days=(e[0]||[]).slice().sort((a,b)=>a-b),k=days.join(',')+'|'+e[1];if(days.length&&!seen[k]){seen[k]=1;out.push([days,String(e[1])])}});return out.sort((a,b)=>a[1]<b[1]?-1:a[1]>b[1]?1:0).slice(0,8)}
+function nextDep(l){let best=null;const now=new Date(),nm=now.getHours()*60+now.getMinutes();(l||[]).forEach(([days,t])=>{const [h,m]=String(t).split(':').map(Number),tm=h*60+m;for(let i=0;i<8;i++){const wd=(now.getDay()+i)%7;if(days.includes(wd)&&(i>0||tm>nm)){const v=i*1440+tm;if(!best||v<best.v)best={v,i,wd,t};break}}});return best}
+const nextTxt=b=>b?`${b.i===0?'اليوم':b.i===1?'غداً':DAYS[b.wd]} ${b.t}`:'';
+function depsHtml(l,o={}){l=mergeDeps(l);if(!l.length)return '';const nx=nextDep(l);
+  return `<div class="deps">${o.title?`<span class="dep-title">${o.title}</span>`:''}${nx?`<span class="dep">${svg('clock')}<span>أقرب رحلة: <b class="dep-next">${esc(nextTxt(nx))}</b></span></span>`:''}${l.map(([d,t])=>`<span class="dep">${svg('bus')}<span>${esc(depDays(d))} · <b dir="ltr">${esc(t)}</b></span></span>`).join('')}</div>`}
+const driverDepsHtml=d=>`<div class="deps">${(d.deps||[]).map(e=>`<span class="dep">${svg('bus')}<span>${esc(routeTxt(e.back?d.to:d.from,e.back?d.from:d.to))} · ${esc(depDays(e.days))} · <b dir="ltr">${esc(e.t)}</b></span></span>`).join('')}</div>`;
+function depsCard(d){const el=$('#drv-deps');if(!el)return;const has=d.deps&&d.deps.length;el.innerHTML=`<div class="sec-head"><h2>مواعيد رحلاتك</h2><button class="btn sm" data-act="deps-edit">${has?'عدّل':'أضف'}</button></div>${has?driverDepsHtml(d):`<p class="hint">أضف أيام وساعات سفرك. يراها الزبائن قبل أن يرسلوا، فيختارون خطّك وهم يعرفون متى يسافر طردهم.</p>`}`}
+function depsSheet(){
+  const d=myDriver();if(!d)return;S.sheet=null;
+  S.depRows=(d.deps&&d.deps.length?d.deps:[{back:false,days:[0,1,2,3,4],t:'07:00'}]).map(e=>({back:!!e.back,days:(e.days||[]).slice(),t:e.t}));
+  openSheet(`${sheetHead('مواعيد رحلاتك')}<p class="lead" style="color:var(--ink-2)">يراها الزبائن قبل أن يرسلوا، دون اسمك أو هاتفك. ويرى كل مرسل موعدك بعد أن تحجز طرده.</p>
+    <form id="deps-form" class="form" novalidate style="display:flex;flex-direction:column;gap:14px"><div id="dep-rows" style="display:flex;flex-direction:column;gap:12px"></div>
+    <button type="button" class="btn sm" data-act="dep-add" style="align-self:flex-start">أضف موعداً</button>
+    <p class="form-err" id="dep-err" role="alert"></p><button class="btn primary block" type="submit">احفظ المواعيد</button></form>`,renderDepRows);
+}
+function renderDepRows(){
+  const d=myDriver(),box=$('#dep-rows');if(!d||!box)return;
+  box.innerHTML=S.depRows.length?S.depRows.map((r,i)=>`<div class="dep-row">
+    <div class="dep-top"><label class="field"><span>الاتجاه</span><select class="dep-dir"><option value="0"${r.back?'':' selected'}>${esc(routeTxt(d.from,d.to))}</option><option value="1"${r.back?' selected':''}>${esc(routeTxt(d.to,d.from))}</option></select></label><label class="field"><span>الساعة</span><input class="dep-t" type="time" dir="ltr" value="${esc(r.t||'07:00')}"></label></div>
+    <div class="days" role="group" aria-label="أيام السفر">${DAYS.map((n,k)=>`<input class="chip-in dep-day" type="checkbox" id="dd-${i}-${k}" value="${k}"${(r.days||[]).includes(k)?' checked':''}><label class="chip" for="dd-${i}-${k}">${n}</label>`).join('')}</div>
+    <button type="button" class="linkbtn" data-act="dep-del" data-i="${i}" style="align-self:flex-start;padding:2px 0">احذف هذا الموعد</button></div>`).join('')
+    :`<p class="hint">لا مواعيد ثابتة. اضغط «أضف موعداً»، أو احفظ هكذا إن كنت تسافر في أوقات مختلفة.</p>`;
+}
+const readDepRows=()=>Array.from(document.querySelectorAll('#dep-rows .dep-row'),el=>({back:el.querySelector('.dep-dir').value==='1',t:el.querySelector('.dep-t').value,days:Array.from(el.querySelectorAll('.dep-day:checked'),x=>+x.value)}));
+async function submitDeps(){
+  const rows=readDepRows(),err=$('#dep-err');
+  if(rows.some(r=>!/^([01]\d|2[0-3]):[0-5]\d$/.test(r.t))){err.textContent='اختر الساعة لكل موعد.';return}
+  if(rows.some(r=>!r.days.length)){err.textContent='اختر يوماً واحداً على الأقل لكل موعد.';return}
+  err.textContent='';
+  const r=await call('setDeps',{deps:rows},{quiet:true});
+  if(!r.ok){err.textContent=r.net?'تعذر الاتصال. تحقق من الإنترنت ثم أعد المحاولة.':r.error;return}
+  closeSheet();toast(rows.length?'حُفظت مواعيدك. يراها الزبائن الآن.':'حُذفت مواعيدك.','ok');
+}
+
+/* ================= promo codes (the discount comes out of the owner's commission only) ================= */
+let promoT=0;
+async function applyPromo(silent){
+  const inp=$('#f-promo'),msg=$('#promo-msg');if(!inp||!msg)return;
+  const code=inp.value.toUpperCase().replace(/[^A-Z0-9]/g,'');
+  if(!code){S.promo=null;msg.textContent='';msg.className='hint';updateQuote();return}
+  const f=+$('#f-from').value,t=+$('#f-to').value,size=(document.querySelector('input[name="size"]:checked')||{}).value||'s';
+  const r=await call('promo',{code,from:f,to:t,size,phone:normPhone($('#f-sphone').value)},{quiet:true,silent:!!silent});
+  if(!$('#f-promo'))return;
+  if(!r.ok){msg.textContent=r.net?'تعذر الاتصال للتحقق من الكود.':r.error||'';msg.className='form-err';return}
+  const x=r.result||{};
+  if(!x.ok){S.promo=null;msg.textContent=x.err||'كود الخصم غير صحيح.';msg.className='form-err'}
+  else{S.promo={code:x.code,d:x.d,k:[f,t,size].join('|')};msg.textContent=x.d>0?`✓ خصم ${DA(x.d)} على هذا الطرد.`:'✓ الكود صالح.';msg.className='promo-ok'}
+  updateQuote();
+}
+const promoShare=c=>`https://wa.me/?text=${encodeURIComponent(`أرسل طردك مع الكار عبر كوليكار، واستعمل كود الخصم ${c.id} لتوفّر ${DA(c.amount)}${c.first?' على أول طرد':''}.${appUrl()?`\n${appUrl()}?promo=${c.id}`:''}`)}`;
+function promoRows(){
+  const P=Object.values(Store.d.promos||{}).sort((a,b)=>(b.createdAt||0)-(a.createdAt||0));
+  if(!P.length)return `<div class="row static"><span class="r1 hint">لا أكواد بعد. أنشئ أول كود أدناه.</span><span class="r3"></span></div>`;
+  return P.map(c=>{const used=parcels().filter(p=>p.promo===c.id&&p.status!=='cancelled'),exp=c.until&&Date.now()>c.until,full=c.max&&used.length>=c.max;
+    return `<div class="row static"><span class="r1"><b dir="ltr">${esc(c.id)}</b> · ${DA(c.amount)}${c.first?' · لأول طرد':''}</span><span class="r3">${!c.active?'<span class="pill mute">موقوف</span>':exp?'<span class="pill mute">انتهى</span>':full?'<span class="pill mute">نفد</span>':'<span class="pill ok">فعّال</span>'}</span>
+      <span class="r2">استُعمل ${used.length}${c.max?` من ${c.max}`:''} مرة · وفّر للزبائن ${DA(sum(used,p=>p.discount))}${c.until?` · حتى ${esc(fmtWith(shortF,c.until))}`:''}</span><span class="r3"></span>
+      <span class="r4"><span class="actions"><a class="btn sm wa" href="${esc(promoShare(c))}" target="_blank" rel="noopener">شاركه</a><button class="btn sm" data-act="promo-toggle" data-id="${esc(c.id)}">${c.active?'أوقفه':'فعّله'}</button><button class="btn sm danger" data-act="promo-del" data-id="${esc(c.id)}">احذفه</button></span></span></div>`}).join('');
+}
+async function submitPromo(){
+  const code=$('#pm-code').value.toUpperCase().replace(/[^A-Z0-9]/g,''),amount=num('#pm-amt'),err=$('#pm-err');
+  if(code.length<3){err.textContent='اكتب الكود بالحروف اللاتينية أو الأرقام، 3 على الأقل. مثال: AHLAN100';return}
+  if(amount<10){err.textContent='اكتب قيمة الخصم بالدينار (10 دج على الأقل).';return}
+  if((Store.d.promos||{})[code]){err.textContent='هذا الكود موجود. اختر اسماً آخر.';return}
+  err.textContent='';
+  const r=await call('promoSave',{promo:{code,amount,max:num('#pm-max'),days:num('#pm-days'),first:$('#pm-first').checked}},{quiet:true});
+  if(!r.ok){err.textContent=r.net?'تعذر الاتصال. تحقق من الإنترنت.':r.error;return}
+  ['#pm-code','#pm-amt'].forEach(id=>{const el=$(id);if(el)el.value=''});toast(`أُنشئ الكود ${code}. شاركه مع الزبائن.`,'ok');
+}
+
+/* ================= invites, share-to-drivers, backup ================= */
+function inviteHtml(d){
+  if(!d||d.example)return '';
+  const st=Store.settings,code=String(d.id).replace(/^D-/,''),url=appUrl()?`${appUrl()}?ref=${code}#driver`:'';
+  const msg=`السلام عليكم، أنا أستعمل كوليكار لأربح من الطرود التي أحملها في رحلاتي بين ${wn(d.from)} و${wn(d.to)}. سجّل أنت أيضاً كسائق بكود دعوتي ${code}${url?`:\n${url}`:''}`;
+  return `<section class="card invite"><h2>ادعُ سائقاً تعرفه</h2><p class="hint">${st.refBonus>0?`تربح <b>${DA(st.refBonus)}</b> في حسابك عن كل سائق يسجّل بكودك وتوثّقه الإدارة.`:'كلما زاد السائقون على الخطوط، زادت ثقة الزبائن وزادت الطرود للجميع.'}</p><div class="code-big">${esc(code)}</div><a class="btn wa block" href="${esc('https://wa.me/?text='+encodeURIComponent(msg))}" target="_blank" rel="noopener">أرسل الدعوة عبر واتساب</a></section>`;
+}
+function shareDriversSheet(id){
+  const p=getP(id);if(!p)return;S.sheet=null;
+  const D=Object.values(Store.d.drivers||{}).filter(d=>!d.example===!p.example&&drvStatus(d.id)==='verified'&&onLine(p,d));
+  const url=appUrl()?`${appUrl()}#driver`:'';
+  const msg=d=>`السلام عليكم${d?' '+d.name:''}، طرد جديد على خط ${wn(p.from)} ← ${wn(p.to)} في كوليكار: ${(SIZES[p.size]||{}).l||''}، ربحك ${DA(p.price-p.commission)}. افتح التطبيق واحجزه قبل غيرك${url?`:\n${url}`:'.'}`;
+  openSheet(`${sheetHead('أبلغ سائقي الخط')}${phead(p)}
+    <p class="hint">الرسالة لا تحتوي اسم المرسل ولا هاتفه. السائق يراهما بعد أن يحجز الطرد في التطبيق.</p>
+    ${D.length?`<div class="rows">${D.map(d=>`<div class="row static"><span class="r1">${esc(d.name)}</span><span class="r3"><a class="btn sm wa" href="${esc(waLink(d.phone,msg(d)))}" target="_blank" rel="noopener">واتساب</a></span><span class="r2">${tel(d.phone)}</span><span class="r3"></span></div>`).join('')}</div>`:`<p class="hint">لا سائق موثّق على هذا الخط بعد.</p>`}
+    <a class="btn wa block" href="${esc('https://wa.me/?text='+encodeURIComponent(msg(null)))}" target="_blank" rel="noopener">أرسلها إلى مجموعة سائقين على واتساب</a>
+    <button class="btn" data-act="pdetail" data-id="${esc(id)}">رجوع إلى الطرد</button>`);
+}
+const backupTxt=()=>{const b=Store.d.backup||{};return b.t?`آخر نسخة احتياطية: ${esc(when(b.t))}. تُنسخ البيانات تلقائياً كل يوم، وتُحفظ آخر 14 نسخة.${b.url?` <a href="${esc(b.url)}" target="_blank" rel="noopener">افتح مجلد النسخ</a>`:''}`:'تُنسخ البيانات تلقائياً كل يوم في Google Drive، وتُحفظ آخر 14 نسخة.'};
 
 /* polling: ask the server every 15 s whether anything changed, reload only when it did */
 let pollT=0;
@@ -599,7 +822,7 @@ async function poll(){
   else if(r.net)setOnline(false);
   schedulePoll();
 }
-document.addEventListener('visibilitychange',()=>{if(!document.hidden)poll()});
+document.addEventListener('visibilitychange',()=>{if(!document.hidden){poll();if(Store.ready)pushCheck().then(renderBells,()=>{})}});
 window.addEventListener('online',()=>poll());
 
 /* photos are kept in the owner's Google Drive and fetched only when he opens them */
@@ -652,17 +875,17 @@ function earnings(){const out=[];parcels().forEach(p=>{if(LIVE.includes(p.status
 const isCashIn=t=>topStatus(t)==='approved'&&((!t.byAdmin&&t.amount>0)||t.kind==='cash');
 function ledgerOf(id){
   const L=[];
-  topupsOf(id).forEach(t=>L.push({t:t.createdAt,amt:+t.amount,label:t.bonus?'هدية شحن':t.kind==='cash'?'شحن نقدي':t.byAdmin?(t.amount>=0?'إضافة من الإدارة':'خصم من الإدارة'):(monthly()?'دفع عبر BaridiMob':'شحن عبر BaridiMob'),sub:t.ref,status:topStatus(t)}));
+  topupsOf(id).forEach(t=>L.push({t:t.createdAt,amt:+t.amount,label:t.bonus?'هدية شحن':/^مكافأة دعوة/.test(t.ref||'')?'مكافأة دعوة':t.kind==='cash'?'شحن نقدي':t.byAdmin?(t.amount>=0?'إضافة من الإدارة':'خصم من الإدارة'):(monthly()?'دفع عبر BaridiMob':'شحن عبر BaridiMob'),sub:String(t.ref||'').replace(/^مكافأة دعوة: /,''),status:topStatus(t)}));
   parcels().forEach(p=>{if(p.driverId===id&&LIVE.includes(p.status))L.push({t:earnedAt(p),amt:-p.commission,label:'عمولة طرد',sub:p.code,status:'approved'});(p.fees||[]).filter(f=>f.driverId===id).forEach(f=>L.push({t:f.t,amt:-f.amount,label:'رسوم إلغاء حجز',sub:p.code,status:'approved'}))});
   return L.sort((a,b)=>b.t-a.t);
 }
 function activeList(){const a=Store.settings.activeWilayas;const l=Array.isArray(a)?a.map(Number).filter(n=>W[n]):[];return l.length>=2?l.sort((x,y)=>x-y):WILAYAS.map(w=>w[0])}
 const wOpts=(sel,list=activeList())=>list.map(n=>`<option value="${n}"${n==sel?' selected':''}>${String(n).padStart(2,'0')} · ${wn(n)}</option>`).join('');
 function defaultPair(){const a=activeList();const f=a.includes(21)?21:a[0];const t=a.includes(16)&&f!==16?16:a.find(x=>x!==f);return [f,t]}
-const settingsKey=()=>{const s=Store.settings;return [s.acceptParcels,s.acceptDrivers,activeList().join(','),s.commission,s.rip,s.contactPhone,s.bonusPct,s.bonusMin,s.cancelFee,s.billing,s.dueDay,s.creditLimit].join('|')};
+const settingsKey=()=>{const s=Store.settings;return [s.acceptParcels,s.acceptDrivers,activeList().join(','),s.commission,s.rip,s.contactPhone,s.bonusPct,s.bonusMin,s.cancelFee,s.billing,s.dueDay,s.creditLimit,s.refBonus].join('|')};
 
 /* ================= UI helpers ================= */
-const S={route:'home',trackCode:'',drvKey:'',setKey:'',regPhoto:null,pkPhoto:null,apf:'all',apq:'',adf:'all',adq:'',awf:'pending',sheet:null,confirmFn:null,chart:null};
+const S={route:'home',trackCode:'',drvKey:'',setKey:'',regPhoto:null,pkPhoto:null,apf:'all',apq:'',adf:'all',adq:'',awf:'pending',sheet:null,confirmFn:null,chart:null,promo:null,depRows:null};
 let toastT=0;
 function toast(msg,kind){const t=$('#toast');t.textContent=msg;t.className='toast'+(kind?' '+kind:'');t.hidden=false;clearTimeout(toastT);toastT=setTimeout(()=>t.hidden=true,4200)}
 function openSheet(html,after){$('#sheet').innerHTML=html;$('#sheet-wrap').hidden=false;if(after)after();const f=$('#sheet [autofocus]')||$('#sheet .x');if(f)f.focus()}
@@ -786,14 +1009,14 @@ VIEWS.home={html(){return `
   <section class="card"><h2>كيف يعمل؟</h2><ol class="how"><li><span><b>المرسل</b> يملأ وصل الإرسال ويحصل على رمزين.</span></li><li><span><b>سائق موثّق</b> على نفس الخط يحجز الطرد ويستلمه برمز الاستلام.</span></li><li><span><b>المستلم</b> يتفقد طرده، ثم يعطي السائق رمز التسليم.</span></li></ol></section>
   ${adminAllowed()?`<button class="admin-entry" data-act="go" data-r="admin">${svg('shield')}<span><b>لوحة التحكم</b><small>تظهر لك وحدك، كصاحب التطبيق</small></span></button>`:''}
   <div class="size-row"><span>حجم الخط</span><div class="chips" role="radiogroup" aria-label="حجم الخط"><input class="chip-in" type="radio" name="fsz" id="fsz-n" value="n"${isBig()?'':' checked'}><label class="chip" for="fsz-n">عادي</label><input class="chip-in" type="radio" name="fsz" id="fsz-b" value="b"${isBig()?' checked':''}><label class="chip" for="fsz-b">كبير</label></div></div>
-  <div class="foot-links"><a href="privacy.html" target="_blank" rel="noopener">سياسة الخصوصية</a>${adminAllowed()?'':`<button class="owner-link" data-act="go" data-r="admin">دخول صاحب التطبيق</button>`}</div>`}};
+  <div class="foot-links">${isApp()?'':`<a href="download.html" target="_blank" rel="noopener">تطبيق أندرويد</a>`}<a href="terms.html" target="_blank" rel="noopener">شروط الاستعمال</a><a href="privacy.html" target="_blank" rel="noopener">سياسة الخصوصية</a>${adminAllowed()?'':`<button class="owner-link" data-act="go" data-r="admin">دخول صاحب التطبيق</button>`}</div>`}};
 
 /* ----- CUSTOMER ----- */
 VIEWS.send={
   html(){
     const st=Store.settings,me=Store.me;
     if(!st.acceptParcels)return `<section class="head"><h1>الإرسال متوقف مؤقتاً</h1><p class="lead">${esc(st.pauseMsg||'نعود قريباً. الطرود التي أرسلتها تُوصَّل كالمعتاد، ويمكنك تتبّعها.')}</p></section><div class="actions"><button class="btn primary" data-act="go" data-r="mine">طرودي</button><button class="btn" data-act="go" data-r="track">تتبّع طرداً</button></div>`;
-    const [f,t]=defaultPair();
+    const [f,t]=defaultPair(),pc=String(lsGet('kolicar.promo')||'');
     return `
     <section class="head"><h1>أرسل طرداً</h1><p class="lead">سائق موثّق، رمز للاستلام ورمز للتسليم، وتتبّع خطوة بخطوة.</p></section>
     <form id="send-form" class="form-steps" novalidate>
@@ -805,7 +1028,7 @@ VIEWS.send={
           <label class="field"><span>إلى ولاية</span><select id="f-to">${wOpts(t)}</select></label>
         </div>
         <button type="button" class="swap" data-act="swap" aria-label="بدّل الاتجاه">${svg('swapv')}</button>
-      </div></section>
+      </div><div id="deps-box"></div></section>
       <section class="card"><div class="step"><i>2</i>ماذا ترسل؟</div>
       <fieldset class="field"><legend>حجم الطرد</legend><div class="chips">${Object.entries(SIZES).map(([k,v])=>`<input class="chip-in" type="radio" name="size" id="sz-${k}" value="${k}"${k==='s'?' checked':''}><label class="chip" for="sz-${k}">${v.l}<small>${v.h}</small></label>`).join('')}</div></fieldset>
       <label class="field"><span>ماذا يحتوي الطرد؟</span><input id="f-desc" maxlength="80" placeholder="مثال: ملف إداري، ملابس، قطع غيار"></label>
@@ -824,7 +1047,10 @@ VIEWS.send={
         <input class="chip-in" type="radio" name="payer" id="pay-s" value="sender" checked><label class="chip" for="pay-s">أنا<small>عند تسليمه للسائق</small></label>
         <input class="chip-in" type="radio" name="payer" id="pay-r" value="receiver"><label class="chip" for="pay-r">المستلم<small>عند الاستلام</small></label>
       </div></fieldset>
-      <label class="check"><input type="checkbox" id="f-decl"><span>أصرّح أن الطرد لا يحتوي على نقود أو ذهب أو أدوية أو مواد قابلة للاشتعال أو ممنوعة، وأقبل أن يعاينه السائق قبل أن يحمله.</span></label>
+      <details class="promo" id="promo-box"${pc?' open':''}><summary>لديك كود خصم؟</summary><div class="promo-in">
+        <div class="promo-row"><label class="sr" for="f-promo">كود الخصم</label><input id="f-promo" maxlength="16" autocapitalize="characters" autocomplete="off" spellcheck="false" placeholder="AHLAN100" value="${esc(pc)}"><button type="button" class="btn sm" data-act="promo-apply">طبّق</button></div>
+        <p class="hint" id="promo-msg"></p></div></details>
+      <label class="check"><input type="checkbox" id="f-decl"><span>أصرّح أن الطرد لا يحتوي على نقود أو ذهب أو أدوية أو مواد قابلة للاشتعال أو ممنوعة، وأقبل أن يعاينه السائق قبل أن يحمله، وأقبل <a href="terms.html" target="_blank" rel="noopener">شروط الاستعمال</a>.</span></label>
       <p class="hint">تدفع السعر نقداً للسائق، ولا شيء غيره.</p></section>
       <div class="checkout">
         <div class="quote" id="quote"></div>
@@ -833,20 +1059,23 @@ VIEWS.send={
       </div>
     </form>`;
   },
-  mount(){updateQuote()},
+  mount(){S.promo=null;updateQuote();const pi=$('#f-promo');if(pi&&pi.value)applyPromo(true)},
   live(){updateQuote()}
 };
 function updateQuote(){
   const f=$('#f-from'),t=$('#f-to'),q=$('#quote');if(!f||!q)return;
   const size=(document.querySelector('input[name="size"]:checked')||{}).value||'s',from=+f.value,to=+t.value;
+  const db=$('#deps-box');if(db)db.innerHTML=from!==to?depsHtml((Store.d.deps||{})[from+'-'+to],{title:'مواعيد الحافلات على هذا الخط'}):'';
   if(from===to){q.innerHTML=`<span class="q-label">اختر ولايتين مختلفتين لترى السعر.</span>`;return}
-  const p=priceOf(from,to,size,Store.settings);
-  q.innerHTML=`<div class="q-label">السعر</div><div class="q-price">${DA(p)}</div><div class="q-meta">≈ ${fmtN(roadKm(from,to))} كم على الطريق</div>`;
+  const p=priceOf(from,to,size,Store.settings),pr=S.promo;let d=0;
+  if(pr){if(pr.k===[from,to,size].join('|'))d=Math.min(pr.d,p);else{clearTimeout(promoT);promoT=setTimeout(()=>applyPromo(true),350)}}
+  q.innerHTML=`<div class="q-label">${d?'السعر بعد الخصم':'السعر'}</div><div class="q-price">${d?`<span class="q-old">${DA(p)}</span>`:''}${DA(p-d)}</div><div class="q-meta">≈ ${fmtN(roadKm(from,to))} كم على الطريق</div>`;
 }
 async function submitSend(){
   const err=$('#send-err'),v=id=>$(id).value.trim();
   const o={from:+v('#f-from'),to:+v('#f-to'),size:(document.querySelector('input[name="size"]:checked')||{}).value,desc:v('#f-desc'),value:+(v('#f-value').replace(/\D/g,''))||0,
-    senderName:v('#f-sname'),senderPhone:normPhone(v('#f-sphone')),recvName:v('#f-rname'),recvPhone:normPhone(v('#f-rphone')),payer:(document.querySelector('input[name="payer"]:checked')||{}).value||'sender'};
+    senderName:v('#f-sname'),senderPhone:normPhone(v('#f-sphone')),recvName:v('#f-rname'),recvPhone:normPhone(v('#f-rphone')),payer:(document.querySelector('input[name="payer"]:checked')||{}).value||'sender',
+    promo:S.promo?S.promo.code:($('#f-promo')?$('#f-promo').value.toUpperCase().replace(/[^A-Z0-9]/g,''):'')};
   const problem=!Store.settings.acceptParcels?'الإرسال متوقف مؤقتاً.':o.from===o.to?'اختر ولاية وصول مختلفة عن ولاية الانطلاق.':!o.desc?'اكتب ما يحتويه الطرد، فالسائق يعاينه قبل حمله.':!o.senderName?'اكتب اسمك.':!validMobile(o.senderPhone)?'رقم هاتفك غير صحيح. مثال: 0555123456':!o.recvName?'اكتب اسم المستلم.':!validMobile(o.recvPhone)?'رقم هاتف المستلم غير صحيح. مثال: 0661234567':!$('#f-decl').checked?'أكّد التصريح بمحتوى الطرد قبل المتابعة.':'';
   if(problem){err.textContent=problem;return}
   err.textContent='';const btn=$('#send-btn');btn.disabled=true;
@@ -854,7 +1083,8 @@ async function submitSend(){
     const r=await call('createParcel',{parcel:o},{quiet:true});
     if(!r.ok){err.textContent=r.net?'تعذر الاتصال. تحقق من الإنترنت ثم أعد المحاولة. لم يُنشأ أي طرد.':r.busy?'لحظة، العملية السابقة لم تنته بعد.':r.error;return}
     const {code,pins}=r.result,me=Store.me;me.sent={...(me.sent||{}),[code]:{...pins,t:Date.now()}};me.name=o.senderName;me.phone=o.senderPhone;saveMe();
-    ['#f-desc','#f-value','#f-rname','#f-rphone'].forEach(id=>{const el=$(id);if(el)el.value=''});const dc=$('#f-decl');if(dc)dc.checked=false;
+    ['#f-desc','#f-value','#f-rname','#f-rphone','#f-promo'].forEach(id=>{const el=$(id);if(el)el.value=''});const dc=$('#f-decl');if(dc)dc.checked=false;
+    if(o.promo){lsDel('kolicar.promo');S.promo=null;const pm=$('#promo-msg');if(pm){pm.textContent='';pm.className='hint'}updateQuote()}
     showCodes(code,true);
   }finally{const b=$('#send-btn');if(b)b.disabled=false}
 }
@@ -865,7 +1095,7 @@ function showCodes(id,fresh){
   if(!pins){openSheet(`${sheetHead('رموز الطرد')}${phead(p)}<p class="lead">رموز هذا الطرد غير محفوظة على هذا الهاتف. اتصل بإدارة كوليكار لتصدر لك رموزاً جديدة.</p>${Store.settings.contactPhone?callBtn(Store.settings.contactPhone,'اتصل بالإدارة'):''}<button class="btn" data-act="close">تم</button>`);return}
   const stale=p.pinsResetAt&&p.pinsResetAt>(pins.t||0);
   openSheet(`${sheetHead(fresh?'وصل الإرسال جاهز':'رموز الطرد')}
-   ${phead(p,`<p class="phead-sub">${DA(p.price)} · ${payerTxt(p)}</p>`)}
+   ${phead(p,`<p class="phead-sub">${DA(p.price)} · ${payerTxt(p)}${p.discount?` · وفّرت ${DA(p.discount)}`:''}</p>`)}
    ${stale?`<div class="warnbox">أصدرت الإدارة رموزاً جديدة لهذا الطرد، فالرموز أدناه لم تعد صالحة. استعمل الرموز التي أرسلتها لك الإدارة.</div>`:''}
    ${fresh?`<p class="shot">صوّر هذه الشاشة أو احفظ الرسالة: الرموز تظهر على هذا الهاتف فقط.</p>`:''}
    <div class="pins">
@@ -874,18 +1104,20 @@ function showCodes(id,fresh){
    </div>
    <a class="btn wa block" href="${esc(waLink(p.recvPhone,receiverMsg(p,pins)))}" target="_blank" rel="noopener">أرسل الرموز للمستلم عبر واتساب</a>
    <div class="actions"><button class="btn" data-act="copy-msg" data-id="${esc(id)}">انسخ الرسالة</button><button class="btn" data-act="${fresh?'codes-done':'close'}">${fresh?'عرض طرودي':'تم'}</button></div>
-   <p class="hint">المستلم: ${esc(p.recvName)} · ${tel(p.recvPhone)}. لا تشارك رمز التسليم مع السائق.</p>`);
+   <p class="hint">المستلم: ${esc(p.recvName)} · ${tel(p.recvPhone)}. لا تشارك رمز التسليم مع السائق.</p>
+   ${fresh?'<div class="bell-slot" data-ctx="customer" data-on="hide"></div>':''}`,renderBells);
 }
 VIEWS.mine={
-  html(){return `<section class="head"><div class="sec-head"><h1>طرودي</h1><span class="count" id="mine-count"></span></div><p class="lead">الطرود التي أرسلتها من هذا الجهاز، برموزها وحالتها.</p></section><div id="mine-list" class="list"></div>`},
+  html(){return `<section class="head"><div class="sec-head"><h1>طرودي</h1><span class="count" id="mine-count"></span></div><p class="lead">الطرود التي أرسلتها من هذا الجهاز، برموزها وحالتها.</p></section><div id="mine-list" class="list"></div><div class="bell-slot" data-ctx="customer"></div>`},
   live(){
     const list=parcels().filter(p=>p.own);
     $('#mine-count').textContent=list.length?plural(list.length,PARCELS):'';
     $('#mine-list').innerHTML=list.length?list.map(p=>pcard(p,{actions:
       `<button class="btn sm primary" data-act="show-codes" data-id="${esc(p.id)}">الرموز وإرسالها</button><button class="btn sm" data-act="track-go" data-id="${esc(p.id)}">تتبّع</button>`+
       (['waiting','accepted'].includes(p.status)?`<button class="btn sm danger" data-act="cancel" data-id="${esc(p.id)}">إلغاء</button>`:''),
-      body:p.driverId&&!['cancelled','delivered'].includes(p.status)?`<div class="pc-people"><span>السائق: <b>${esc(p.driverName)}</b> · <span dir="ltr">${esc(p.driverPlate)}</span></span>${callBtn(p.driverPhone,'اتصل بالسائق')}</div>`:''})).join('')
+      body:p.driverId&&!['cancelled','delivered'].includes(p.status)?`<div class="pc-people"><span>السائق: <b>${esc(p.driverName)}</b> · <span dir="ltr">${esc(p.driverPlate)}</span></span>${callBtn(p.driverPhone,'اتصل بالسائق')}</div>${p.dep&&p.status==='accepted'?depsHtml(p.dep,{title:'يسافر السائق عادة:'}):''}`:''})).join('')
       :`<div class="empty"><span>لم ترسل أي طرد من هذا الجهاز بعد.</span><button class="btn primary sm" data-act="go" data-r="send">أرسل أول طرد</button></div>`;
+    renderBells();
   }
 };
 VIEWS.track={
@@ -905,8 +1137,9 @@ VIEWS.track={
         const cur=p.status==='cancelled'?-1:STEPS.indexOf(p.status),r=p.driverRating;
         box.innerHTML=`${phead(p,p.status==='cancelled'?`<div class="warnbox">هذا الطرد أُلغي.</div>`:`<ol class="steps">${STEPS.map((s,i)=>`<li class="${i<cur||(i===cur&&s==='delivered')?'done':i===cur?'now':''}">${STEP_L[s]}</li>`).join('')}</ol>`)}
           <div class="card"><dl class="kv"><dt>المبلغ</dt><dd>${DA(p.price)}، ${payerTxt(p)}</dd><dt>المرسل</dt><dd>${esc(p.senderName)}</dd><dt>المستلم</dt><dd>${esc(p.recvName)}</dd>
-            ${p.driverId?`<dt>السائق</dt><dd>${esc(p.driverName)} <span class="badge-ok">${svg('check')}موثّق</span>${r?` · ${r.avg.toFixed(1)}★`:''}</dd><dt>الحافلة</dt><dd dir="ltr" style="text-align:right">${esc(p.driverPlate)}</dd>${p.driverPhone?`<dt>هاتفه</dt><dd>${tel(p.driverPhone)}</dd>`:''}`:`<dt>السائق</dt><dd>لم يُحجز بعد</dd>`}</dl></div>
+            ${p.driverId?`<dt>السائق</dt><dd>${esc(p.driverName)} <span class="badge-ok">${svg('check')}موثّق</span>${r?` · ${r.avg.toFixed(1)}★`:''}</dd><dt>الحافلة</dt><dd dir="ltr" style="text-align:right">${esc(p.driverPlate)}</dd>${p.driverPhone?`<dt>هاتفه</dt><dd>${tel(p.driverPhone)}</dd>`:''}${p.dep&&p.status==='accepted'?`<dt>يسافر عادة</dt><dd>${depsHtml(p.dep)}</dd>`:''}`:`<dt>السائق</dt><dd>لم يُحجز بعد</dd>`}</dl></div>
           ${['picked','arrived'].includes(p.status)?`<div class="safety">${svg('safe')}<span><b>للمستلم:</b> لا تعطِ رمز التسليم للسائق إلا بعد أن تستلم الطرد بيدك وتتفقده. الرمز هو توقيعك على الاستلام.</span></div>`:''}
+          ${['waiting','accepted','picked','arrived'].includes(p.status)&&!p.example?`<div class="bell-slot" data-ctx="track" data-code="${esc(p.code)}"></div>`:''}
           ${p.status==='delivered'?(p.rating?`<div class="card"><p>قُيّم السائق بـ ${p.rating} من 5. شكراً لك.</p></div>`:`<div class="card"><h3>كيف كان السائق؟</h3><div class="stars">${[1,2,3,4,5].map(k=>`<button class="star" data-act="rate" data-id="${esc(p.code)}" data-v="${k}" aria-label="${k} من 5">★</button>`).join('')}</div></div>`):''}
           <div class="card"><h3>سجل الطرد</h3><ol class="timeline">${(p.events||[]).slice().reverse().map(e=>`<li><time>${when(e.t)}</time>${EV_L[e.s]||e.s}${e.v?` (${e.v}★)`:''}</li>`).join('')}</ol></div>`;
       }
@@ -914,6 +1147,7 @@ VIEWS.track={
     const tr=(Store.me.tracked||[]).filter(c=>c!==code).slice(0,5);
     $('#track-recent').innerHTML=tr.length?`<h2>تتبّعتها مؤخراً</h2><div class="rows">${tr.map(c=>{const p=(TRK[c]||{}).p;return `<button class="row" data-act="track-go" data-id="${esc(c)}"><span class="r1">${p?esc(routeTxt(p.from,p.to)):'طرد'}</span><span class="r3">${p?pill(p.status):''}</span><span class="r2" dir="ltr" style="text-align:right">${esc(c)}</span><span class="r3 r2">${p?ago(p.createdAt):''}</span></button>`}).join('')}</div>`
       :(!code&&Store.d.demoAvailable?`<p class="hint center">جرّب الرمز <b dir="ltr">KCEX02</b> لترى طرداً تجريبياً في الطريق.</p>`:'');
+    renderBells();
   }
 };
 const TRK={},trkBusy={};
@@ -947,13 +1181,14 @@ VIEWS.driver={
         <h2>تسجيل سائق</h2>
         <div class="two"><label class="field"><span>الاسم الكامل</span><input id="d-name" autocomplete="name"></label><label class="field"><span>الهاتف</span><input id="d-phone" inputmode="tel" dir="ltr" placeholder="0555 12 34 56"></label></div>
         <div class="two"><label class="field"><span>رقم تسجيل الحافلة</span><input id="d-plate" dir="ltr" placeholder="01234-115-21"></label><label class="field"><span>اسم الناقل أو الشركة</span><input id="d-company"></label></div>
+        <label class="field"><span>كود الدعوة (اختياري)</span><input id="d-ref" dir="ltr" maxlength="10" autocapitalize="characters" autocomplete="off" spellcheck="false" placeholder="إن دعاك سائق" value="${esc(lsGet('kolicar.ref')||'')}"></label>
         <div class="trip">
           <div class="trip-rail" aria-hidden="true"><i class="o"></i><span></span><i class="d"></i></div>
           <div class="trip-fields"><label class="field"><span>خطّك من</span><select id="d-from">${wOpts(f)}</select></label><label class="field"><span>إلى</span><select id="d-to">${wOpts(t)}</select></label></div>
           <span></span>
         </div>
         <div class="field"><span>صورة بطاقة التعريف أو رخصة السياقة</span><div class="file"><input type="file" id="d-photo" accept="image/*"><img id="d-prev" class="thumb" alt="معاينة الوثيقة" hidden></div><span class="hint">يراها صاحب التطبيق وحده، للتحقق من هويتك قبل تفعيل حسابك.</span></div>
-        <label class="check"><input type="checkbox" id="d-commit"><span>ألتزم بمعاينة كل طرد قبل حمله، وبعدم تسليمه إلا برمز التسليم، وبأن أتعامل مع زبائن كوليكار عبر التطبيق فقط. التعامل معهم خارج التطبيق يؤدي إلى إيقاف حسابي.</span></label>
+        <label class="check"><input type="checkbox" id="d-commit"><span>ألتزم بمعاينة كل طرد قبل حمله، وبعدم تسليمه إلا برمز التسليم، وبأن أتعامل مع زبائن كوليكار عبر التطبيق فقط. التعامل معهم خارج التطبيق يؤدي إلى إيقاف حسابي. وأقبل <a href="terms.html" target="_blank" rel="noopener">شروط الاستعمال</a>.</span></label>
         <p class="form-err" id="reg-err" role="alert"></p>
         <button class="btn primary block" type="submit" id="reg-btn">أرسل طلب التسجيل</button>
       </form>${demo}`;
@@ -962,14 +1197,18 @@ VIEWS.driver={
     if(s!=='verified')return `
       <section class="head"><h1>${s==='rejected'?'طلبك لم يُقبل':s==='suspended'?'حسابك موقوف':'طلبك قيد المراجعة'}</h1><p class="lead">${s==='pending'?'نتحقق من هويتك ومن رخصة الحافلة، وسنتصل بك قبل التفعيل.':'تواصل مع إدارة كوليكار لمعرفة السبب.'}</p></section>
       ${profileCard(d,s)}
+      ${s==='pending'?'<div class="bell-slot" data-ctx="pending"></div>':''}
       ${s==='pending'&&adminAllowed()?`<p class="hint">أنت صاحب التطبيق: يمكنك قبول هذا الطلب من لوحة التحكم.</p>`:''}
       <button class="linkbtn" data-act="drv-logout">استعمل حساب سائق آخر على هذا الجهاز</button>`;
     return `${profileCard(d,s)}
       <div id="drv-stats" class="stats"></div>
-      <section><div class="sec-head"><h2>على خطّك الآن</h2><span class="count" id="avail-count"></span></div><div id="drv-avail" class="list"></div></section>`;
+      <div class="bell-slot" data-ctx="driver" data-on="hide"></div>
+      <section><div class="sec-head"><h2>على خطّك الآن</h2><span class="count" id="avail-count"></span></div><div id="drv-avail" class="list"></div></section>
+      <section class="card" id="drv-deps"></section>`;
   },
   live(){
-    const d=myDriver();if(!d||!driverVerified())return;
+    const d=myDriver();renderBells();if(!d||!driverVerified())return;
+    depsCard(d);
     const res=reservedOf(d.id),avail=availOf(d.id),act=parcels().filter(p=>p.driverId===d.id&&ACTIVE.includes(p.status));
     const X=monthly()?duesOf(d.id):null;
     $('#drv-stats').innerHTML=(X?`<button class="stat hl" data-act="go" data-r="wallet"><span class="k">عليك حالياً</span><span class="v">${DA(X.debt)}</span><span class="s">${X.overdue?`متأخر: ${DA(X.overdue)}`:`عمولات هذا الشهر: ${DA(X.month)}`}</span></button>`:`<button class="stat hl" data-act="go" data-r="wallet"><span class="k">الرصيد المتاح</span><span class="v">${DA(avail)}</span><span class="s">${res?`محجوز للعمولات: ${DA(res)}`:'اضغط لشحن رصيدك'}</span></button>`)+`
@@ -1019,7 +1258,9 @@ VIEWS.wallet={
       <button class="btn primary block" type="submit">${monthly()?'أرسل إثبات الدفع':'أرسل طلب الشحن'}</button>
     </form>
     ${st.contactPhone?`<div class="card"><h2>تفضّل الدفع نقداً؟</h2><p class="hint">ادفع لصاحب التطبيق مباشرة، ويسجّل المبلغ في حسابك.</p><div class="actions"><a class="btn wa" href="${esc(waLink(st.contactPhone,'السلام عليكم، أريد شحن رصيدي في كوليكار نقداً.'))}" target="_blank" rel="noopener">راسله عبر واتساب</a><span class="hint" style="align-self:center">${tel(st.contactPhone)}</span></div></div>`:''}
-    <section><h2>حركات الرصيد</h2><div id="drv-ledger"></div></section>`},
+    ${inviteHtml(myDriver())}
+    <section><h2>حركات الرصيد</h2><div id="drv-ledger"></div></section>
+    <div class="bell-slot" data-ctx="driver"></div>`},
   live(){
     const d=myDriver();if(!d)return;
     const res=reservedOf(d.id),done=parcels().filter(p=>p.driverId===d.id&&p.status==='delivered'),r=ratingOf(d.id),fees=feesOf(d.id);
@@ -1029,19 +1270,20 @@ VIEWS.wallet={
       <div class="stat"><span class="k">${monthly()?'عمولات هذا الشهر':'عمولات خُصمت'}</span><span class="v">${DA(X?X.month:commissionsOf(d.id)+fees)}</span><span class="s">${X?'تُسدَّد قبل '+dueTxt():fees?`منها رسوم إلغاء: ${DA(fees)}`:'منذ التسجيل'}</span></div>
       <div class="stat"><span class="k">التقييم</span><span class="v">${r?r.avg.toFixed(1)+' / 5':'—'}</span><span class="s">${r?`عدد التقييمات: ${r.n}`:'لا تقييمات بعد'}</span></div>`;
     const L=ledgerOf(d.id).slice(0,15);
-    $('#drv-ledger').innerHTML=L.length?`<div class="rows">${L.map(x=>`<div class="row static"><span class="r1">${x.label}</span><span class="r3 n${x.amt>0?' plus':''}">${x.amt>0?'+':'−'}${DA(Math.abs(x.amt))}</span><span class="r2"><span dir="ltr">${esc(x.sub||'')}</span> · ${ago(x.t)}</span><span class="r3">${x.status!=='approved'?tpill(x.status):''}</span></div>`).join('')}</div>`:`<div class="empty">لا حركات بعد.</div>`;
+    $('#drv-ledger').innerHTML=L.length?`<div class="rows">${L.map(x=>`<div class="row static"><span class="r1">${x.label}</span><span class="r3 n${x.amt>0?' plus':''}">${x.amt>0?'+':'−'}${DA(Math.abs(x.amt))}</span><span class="r2"><span dir="auto">${esc(x.sub||'')}</span> · ${ago(x.t)}</span><span class="r3">${x.status!=='approved'?tpill(x.status):''}</span></div>`).join('')}</div>`:`<div class="empty">لا حركات بعد.</div>`;
+    renderBells();
   }
 };
 async function submitReg(){
   const v=id=>$(id).value.trim(),err=$('#reg-err');
-  const o={name:v('#d-name'),phone:normPhone(v('#d-phone')),plate:v('#d-plate'),company:v('#d-company'),from:+v('#d-from'),to:+v('#d-to')};
+  const o={name:v('#d-name'),phone:normPhone(v('#d-phone')),plate:v('#d-plate'),company:v('#d-company'),from:+v('#d-from'),to:+v('#d-to'),ref:$('#d-ref')?v('#d-ref').toUpperCase().replace(/[^A-Z0-9]/g,''):''};
   const problem=!Store.settings.acceptDrivers?'التسجيل مغلق حالياً.':!o.name?'اكتب اسمك الكامل.':!validMobile(o.phone)?'رقم الهاتف غير صحيح. مثال: 0555123456':!o.plate?'اكتب رقم تسجيل الحافلة.':o.from===o.to?'اختر ولايتين مختلفتين لخطّك.':!S.regPhoto?'أضف صورة بطاقة التعريف أو رخصة السياقة.':!$('#d-commit').checked?'وافق على الالتزام قبل الإرسال.':'';
   if(problem){err.textContent=problem;return}
   err.textContent='';$('#reg-btn').disabled=true;
   try{
     const r=await call('registerDriver',{driver:o,photo:S.regPhoto},{quiet:true});
     if(!r.ok){err.textContent=r.net?'تعذر الاتصال. تحقق من الإنترنت ثم أعد المحاولة.':r.busy?'لحظة، العملية السابقة لم تنته بعد.':r.error;return}
-    S.regPhoto=null;Store.me.driverId=r.result.driverId;saveMe();go('driver');toast('وصل طلبك. سنتحقق منه ونفعّل حسابك.','ok');
+    S.regPhoto=null;Store.me.driverId=r.result.driverId;saveMe();lsDel('kolicar.ref');go('driver');toast('وصل طلبك. سنتحقق منه ونفعّل حسابك.','ok');
   }finally{const b=$('#reg-btn');if(b)b.disabled=false}
 }
 function loginSheet(){
@@ -1121,6 +1363,7 @@ function pendingList(){
     <div class="actions"><button class="btn sm primary" data-act="verify" data-id="${esc(d.id)}" data-v="verified">قبول</button><button class="btn sm danger" data-act="verify" data-id="${esc(d.id)}" data-v="rejected">رفض</button><button class="btn sm" data-act="ddetail" data-id="${esc(d.id)}">الملف</button></div></div></div>`)});
   topups().filter(t=>topStatus(t)==='pending').forEach(t=>{const d=(D.drivers||{})[t.driverId];out.push(`<div class="card"><div class="sec-head"><b>طلب شحن ${DA(t.amount)}${ex(t)}</b><span class="hint">${ago(t.createdAt)}</span></div><span class="hint">${esc(d?d.name:'سائق')} · رقم العملية <span dir="ltr">${esc(t.ref)}</span>. تأكد من وصول المبلغ إلى حسابك قبل القبول.</span><div class="actions"><button class="btn sm primary" data-act="approve" data-id="${esc(t.id)}" data-v="approved">وصل المبلغ</button><button class="btn sm danger" data-act="approve" data-id="${esc(t.id)}" data-v="rejected">لم يصل</button></div></div>`)});
   parcels().filter(isLocked).forEach(p=>out.push(`<div class="card"><b>تسليم مقفل: <span dir="ltr">${esc(p.code)}</span></b><span class="hint">${MAX_FAIL} محاولات برمز خاطئ. تحقق مع المرسل والمستلم قبل الفتح.</span><div class="actions"><button class="btn sm" data-act="unlock" data-id="${esc(p.id)}">افتح التسليم</button><button class="btn sm" data-act="pdetail" data-id="${esc(p.id)}">التفاصيل</button></div></div>`));
+  parcels().filter(p=>p.status==='waiting'&&!p.example&&Date.now()-(p.createdAt||0)>20*6e4).forEach(p=>out.push(`<div class="card"><b>طرد ينتظر سائقاً ${ago(p.createdAt)}: ${esc(routeTxt(p.from,p.to))}</b><span class="hint">${esc((SIZES[p.size]||{}).l||'')} · ربح السائق ${DA(p.price-p.commission)}. أبلغ سائقي الخط ليحجزه أحدهم.</span><div class="actions"><button class="btn sm wa" data-act="share-drivers" data-id="${esc(p.id)}">أبلغ السائقين</button><button class="btn sm" data-act="pdetail" data-id="${esc(p.id)}">التفاصيل</button></div></div>`));
   parcels().filter(isLate).forEach(p=>out.push(`<div class="card"><b>حجز متأخر: <span dir="ltr">${esc(p.code)}</span></b><span class="hint">${esc(p.driverName)} حجزه ${ago(p.acceptedAt||p.createdAt)} ولم يستلمه في التطبيق. قد يكون تعامل مع المرسل خارج التطبيق.</span><div class="actions"><a class="btn sm" href="tel:${esc(normPhone(p.driverPhone))}">اتصل بالسائق</a><button class="btn sm" data-act="pdetail" data-id="${esc(p.id)}">التفاصيل</button></div></div>`));
   return out;
 }
@@ -1128,6 +1371,7 @@ VIEWS.admin={
   html(){return `
     <section class="head"><h1>لوحة التحكم</h1><p class="lead">${esc(fmtWith(dayF,Date.now()))}</p></section>
     <div id="a-kpis" class="stats"></div>
+    <div class="bell-slot" data-ctx="admin" data-on="hide"></div>
     <section class="card"><h2>دخلك في آخر 14 يوماً</h2><div id="a-chart"></div>
       <details class="tbl"><summary>عرض الأرقام كجدول</summary><table><thead><tr><th>اليوم</th><th class="n">طرود استُلمت</th><th class="n">الدخل</th></tr></thead><tbody id="a-table"></tbody></table></details></section>
     <section><div class="sec-head"><h2>ينتظر قرارك</h2><span class="count" id="a-pcount"></span></div><div id="a-pending" class="list"></div></section>
@@ -1148,6 +1392,7 @@ VIEWS.admin={
     $('#a-low').innerHTML=low.length?`<div class="sec-head"><h2>${M?'مستحقات متأخرة':'يحتاجون شحن الرصيد'}</h2><span class="count">${low.length}</span></div><p class="hint">${M?`سائقون عليهم عمولات من شهر سابق. بعد ${dueTxt()} يتوقف حسابهم تلقائياً حتى يسدّدوا.`:`سائقون موثّقون رصيدهم أقل من ${DA(st.lowBalance)}، فلا يستطيعون حجز أغلب الطرود.`} ذكّرهم برسالة جاهزة.</p><div class="rows">${low.map(d=>`<div class="row static"><span class="r1">${esc(d.name)}${ex(d)}</span><span class="r3 n">${M?DA(duesOf(d.id).debt):DA(availOf(d.id))}</span><span class="r2">${esc(wn(d.from))} ⇄ ${esc(wn(d.to))}${M&&duesOf(d.id).blocked?' · موقوف حتى يسدّد':''}</span><span class="r3"><span class="actions" style="gap:6px;flex-wrap:nowrap"><a class="btn sm wa" href="${esc(waLink(d.phone,remindMsg(d)))}" target="_blank" rel="noopener">ذكّره</a><button class="btn sm" data-act="ddetail" data-id="${esc(d.id)}">الملف</button></span></span></div>`).join('')}</div>`:'';
     const ev=[];all.forEach(p=>(p.events||[]).forEach(e=>ev.push({e,p})));ev.sort((a,b)=>b.e.t-a.e.t);
     $('#a-feed').innerHTML=ev.length?ev.slice(0,8).map(({e,p})=>`<button class="row" data-act="pdetail" data-id="${esc(p.id)}"><span class="r1">${EV_SHORT[e.s]||e.s} · ${esc(routeTxt(p.from,p.to))}</span><span class="r3 r2">${ago(e.t)}</span><span class="r2" dir="ltr" style="text-align:right">${esc(p.code)}</span><span class="r3"></span></button>`).join(''):`<div class="empty" style="box-shadow:none">لا نشاط بعد.</div>`;
+    renderBells();
   }
 };
 function niceCeil(v){if(v<=0)return 100;const p=Math.pow(10,Math.floor(Math.log10(v))),m=v/p;return (m<=1?1:m<=2?2:m<=2.5?2.5:m<=5?5:10)*p}
@@ -1231,6 +1476,16 @@ VIEWS['admin-config']={
     <form id="announce-form" class="card form" novalidate><h2>إعلان للمستخدمين</h2><p class="hint">يظهر في أعلى التطبيق عند كل الزبائن والسائقين.</p>
       <label class="field"><span class="sr">نص الإعلان</span><textarea id="c-announce" rows="3" maxlength="200" placeholder="مثال: عطلة العيد: لا رحلات يومي الثلاثاء والأربعاء">${esc(st.announce)}</textarea></label>
       <div class="actions"><button class="btn primary" type="submit">انشر الإعلان</button><button class="btn" type="button" data-act="clear-announce">احذف الإعلان</button></div></form>
+    <section class="card"><h2>تنبيهات هاتفك</h2><div class="bell-slot" data-ctx="admin"></div></section>
+    <section class="card"><h2>أكواد الخصم</h2><p class="hint">كود يكتبه الزبون عند الإرسال. الخصم يُقتطع من عمولتك وحدها، والسائق يربح المبلغ نفسه. شارك رابط الكود في صفحتك أو في مجموعات واتساب.</p>
+      <div id="promo-list" class="rows">${promoRows()}</div>
+      <form id="promo-form" class="form" novalidate style="display:flex;flex-direction:column;gap:14px">
+        <div class="two"><label class="field"><span>الكود</span><input id="pm-code" dir="ltr" maxlength="16" autocapitalize="characters" autocomplete="off" spellcheck="false" placeholder="AHLAN100"></label><label class="field"><span>قيمة الخصم (دج)</span><input id="pm-amt" inputmode="numeric" placeholder="100"></label></div>
+        <div class="two"><label class="field"><span>عدد الاستعمالات (0 = بلا حد)</span><input id="pm-max" inputmode="numeric" value="0"></label><label class="field"><span>صالح لمدة (أيام، 0 = بلا تاريخ)</span><input id="pm-days" inputmode="numeric" value="30"></label></div>
+        <label class="check"><input type="checkbox" id="pm-first" checked><span>لأول طرد فقط (زبون جديد)</span></label>
+        <p class="form-err" id="pm-err" role="alert"></p>
+        <button class="btn primary" type="submit">أنشئ الكود</button>
+      </form></section>
     <form id="collect-form" class="card form" novalidate>
       <h2>تحصيل العمولات</h2>
       <fieldset class="field"><legend>طريقة الدفع</legend><div class="chips">
@@ -1241,6 +1496,7 @@ VIEWS['admin-config']={
       <div class="two"><label class="field"><span>عمولتك (%)</span><input id="s-com" inputmode="numeric" value="${st.commission}"></label><label class="field"><span>تنبيه رصيد منخفض تحت (دج، للرصيد المسبق)</span><input id="s-low" inputmode="numeric" value="${st.lowBalance}"></label></div>
       <label class="toggle"><span><b>رسوم إلغاء الحجز</b><small>إذا ألغى السائق حجزاً بعد قبوله، تُحسب عليه قيمة العمولة. يمنعه من أخذ رقم المرسل ثم التعامل خارج التطبيق.</small></span><input type="checkbox" id="s-cancel"${st.cancelFee?' checked':''}></label>
       <div class="two"><label class="field"><span>هدية الدفع المسبق (%)</span><input id="s-bonus" inputmode="numeric" value="${st.bonusPct}"></label><label class="field"><span>لمن يشحن على الأقل (دج)</span><input id="s-bmin" inputmode="numeric" value="${st.bonusMin}"></label></div>
+      <label class="field"><span>مكافأة دعوة سائق (دج لكل سائق جديد تُوثّقه، 0 = بلا مكافأة)</span><input id="s-ref" inputmode="numeric" value="${st.refBonus}"></label>
       <label class="field"><span>حساب BaridiMob أو RIP لاستقبال الشحن</span><input id="s-rip" dir="ltr" value="${esc(st.rip)}" placeholder="00799999 ..."></label>
       <label class="field"><span>هاتفك للشحن النقدي</span><input id="s-phone" inputmode="tel" dir="ltr" value="${esc(st.contactPhone)}" placeholder="0555 12 34 56"></label>
       <p class="form-err" id="col-err" role="alert"></p>
@@ -1260,8 +1516,10 @@ VIEWS['admin-config']={
       <button class="btn primary block" type="submit">احفظ الولايات</button></form>
     <section class="card"><h2>بيانات الأمثلة</h2><p class="hint">الطرود والسائقون المعلّمون «مثال» للتجربة فقط. احذفها قبل أن تشارك التطبيق مع زبائن وسائقين حقيقيين.</p><button class="btn danger" data-act="del-examples" style="align-self:flex-start">احذف الأمثلة</button></section>
     <section class="card"><h2>بياناتك</h2><p class="hint">كل الطرود والسائقين والمدفوعات محفوظة في جدول Google Sheets في حسابك، وصور الوثائق في مجلد «كوليكار — الصور» في Google Drive. اقرأ الجدول كما تشاء، ولا تعدّل عمود «بيانات التطبيق».</p>
-      <div class="actions">${Store.d.sheetUrl?`<a class="btn" href="${esc(Store.d.sheetUrl)}" target="_blank" rel="noopener">افتح جدول البيانات</a>`:''}${appUrl()?`<button class="btn" data-act="copy-link">انسخ رابط التطبيق</button>`:''}<button class="btn" data-act="admin-logout">اخرج من الإدارة على هذا الهاتف</button></div></section>`},
-  mount(){settingsExample()}
+      <p class="hint" id="backup-info">${backupTxt()}</p>
+      <div class="actions">${Store.d.sheetUrl?`<a class="btn" href="${esc(Store.d.sheetUrl)}" target="_blank" rel="noopener">افتح جدول البيانات</a>`:''}${appUrl()?`<button class="btn" data-act="copy-link">انسخ رابط التطبيق</button>`:''}<button class="btn" data-act="backup-now">انسخ نسخة احتياطية الآن</button><button class="btn" data-act="admin-logout">اخرج من الإدارة على هذا الهاتف</button></div></section>`},
+  mount(){settingsExample()},
+  live(){const l=$('#promo-list');if(l)l.innerHTML=promoRows();const b=$('#backup-info');if(b)b.innerHTML=backupTxt();renderBells()}
 };
 const num=id=>{const el=$(id);return el?(+(el.value.replace(/\D/g,''))||0):0};
 function settingsExample(){const el=$('#s-example');if(!el)return;const st={commission:Store.settings.commission,per100:num('#s-per'),base:{doc:num('#s-b-doc'),s:num('#s-b-s'),m:num('#s-b-m'),l:num('#s-b-l')}};const p=priceOf(21,16,'s',st);el.textContent=`مثال: طرد صغير من سكيكدة إلى الجزائر = ${DA(p)}، عمولتك منه ${DA(Math.round(p*st.commission/100))}.`}
@@ -1272,7 +1530,7 @@ async function submitCollect(){
   const phone=normPhone($('#s-phone').value),err=$('#col-err');
   if(phone&&!validMobile(phone)){err.textContent='رقم الهاتف غير صحيح. مثال: 0555123456';return}
   err.textContent='';
-  if(await savePatch({commission:Math.min(50,num('#s-com')),lowBalance:num('#s-low'),billing:(document.querySelector('input[name="billing"]:checked')||{}).value||'monthly',dueDay:Math.min(28,Math.max(1,num('#s-due')||5)),creditLimit:num('#s-limit')||10000,cancelFee:$('#s-cancel').checked,bonusPct:Math.min(50,num('#s-bonus')),bonusMin:num('#s-bmin')||5000,rip:$('#s-rip').value.trim(),contactPhone:phone}))toast('حُفظت إعدادات التحصيل.','ok');
+  if(await savePatch({commission:Math.min(50,num('#s-com')),lowBalance:num('#s-low'),billing:(document.querySelector('input[name="billing"]:checked')||{}).value||'monthly',dueDay:Math.min(28,Math.max(1,num('#s-due')||5)),creditLimit:num('#s-limit')||10000,cancelFee:$('#s-cancel').checked,bonusPct:Math.min(50,num('#s-bonus')),bonusMin:num('#s-bmin')||5000,rip:$('#s-rip').value.trim(),contactPhone:phone,refBonus:num('#s-ref')}))toast('حُفظت إعدادات التحصيل.','ok');
 }
 async function submitWilayas(){
   const all=$('#w-all').checked,list=Array.from(document.querySelectorAll('input[name="w"]:checked'),i=>+i.value),err=$('#w-err');
@@ -1281,12 +1539,12 @@ async function submitWilayas(){
 }
 function parcelDetail(id){
   const p=getP(id);if(!p)return;const adm=adminAllowed();S.sheet={kind:'parcel',id};
-  const acts=adm?[(['waiting','accepted'].includes(p.status)?`<button class="btn sm danger" data-act="a-cancel" data-id="${esc(id)}">ألغِ الطرد</button>`:''),(p.status==='accepted'?`<button class="btn sm" data-act="a-unassign" data-id="${esc(id)}">أعده للانتظار</button>`:''),(isLocked(p)?`<button class="btn sm" data-act="unlock" data-id="${esc(id)}">افتح التسليم</button>`:''),(!['delivered','cancelled'].includes(p.status)?`<button class="btn sm" data-act="reset-pins" data-id="${esc(id)}">رموز جديدة</button>`:'')].join(''):'';
+  const acts=adm?[(p.status==='waiting'&&!p.example?`<button class="btn sm wa" data-act="share-drivers" data-id="${esc(id)}">أبلغ سائقي الخط</button>`:''),(['waiting','accepted'].includes(p.status)?`<button class="btn sm danger" data-act="a-cancel" data-id="${esc(id)}">ألغِ الطرد</button>`:''),(p.status==='accepted'?`<button class="btn sm" data-act="a-unassign" data-id="${esc(id)}">أعده للانتظار</button>`:''),(isLocked(p)?`<button class="btn sm" data-act="unlock" data-id="${esc(id)}">افتح التسليم</button>`:''),(!['delivered','cancelled'].includes(p.status)?`<button class="btn sm" data-act="reset-pins" data-id="${esc(id)}">رموز جديدة</button>`:'')].join(''):'';
   const fees=(p.fees||[]);
   openSheet(`${sheetHead('تفاصيل الطرد')}
     ${phead(p)}
     ${acts?`<div class="actions">${acts}</div>`:''}
-    <dl class="kv"><dt>الحجم</dt><dd>${esc(SIZES[p.size].l)} · ≈ ${fmtN(p.km)} كم</dd><dt>القيمة المصرّح بها</dt><dd>${p.value?DA(p.value):'غير مذكورة'}</dd><dt>السعر</dt><dd>${DA(p.price)} (${payerTxt(p)})</dd><dt>عمولتك</dt><dd>${DA(p.commission)}</dd>
+    <dl class="kv"><dt>الحجم</dt><dd>${esc(SIZES[p.size].l)} · ≈ ${fmtN(p.km)} كم</dd><dt>القيمة المصرّح بها</dt><dd>${p.value?DA(p.value):'غير مذكورة'}</dd><dt>السعر</dt><dd>${DA(p.price)} (${payerTxt(p)})</dd><dt>عمولتك</dt><dd>${DA(p.commission)}</dd>${p.promo?`<dt>كود خصم</dt><dd><span dir="ltr">${esc(p.promo)}</span> · −${DA(p.discount)}</dd>`:''}
     ${fees.length?`<dt>رسوم إلغاء</dt><dd>${DA(sum(fees,f=>f.amount))}</dd>`:''}
     <dt>المرسل</dt><dd>${esc(p.senderName)} · ${tel(p.senderPhone)}</dd><dt>المستلم</dt><dd>${esc(p.recvName)} · ${tel(p.recvPhone)}</dd>
     ${p.driverId?`<dt>السائق</dt><dd>${esc(p.driverName)} · <span dir="ltr">${esc(p.driverPlate)}</span> · ${tel(p.driverPhone)}</dd>`:''}${p.failed?`<dt>رموز خاطئة</dt><dd>${p.failed}</dd>`:''}</dl>
@@ -1301,13 +1559,13 @@ function driverDetail(id){
   openSheet(`${sheetHead('ملف السائق')}
     ${profileCard(d,s)}
     <div class="actions">${acts}${s==='verified'&&needsPay(id)?`<a class="btn sm wa" href="${esc(waLink(d.phone,remindMsg(d)))}" target="_blank" rel="noopener">${monthly()?'ذكّره بالدفع':'ذكّره بالشحن'}</a>`:''}${d.example?'':`<button class="btn sm" data-act="issue-login" data-id="${esc(id)}">رمز دخول لهاتف جديد</button>`}</div>
-    <dl class="kv"><dt>الهاتف</dt><dd>${tel(d.phone)}</dd><dt>سجّل</dt><dd>${when(d.createdAt)}</dd>${monthly()?(()=>{const x=duesOf(id);return `<dt>عليه حالياً</dt><dd>${DA(x.debt)}${x.overdue?` (متأخر ${DA(x.overdue)})`:''}${x.blocked?' <span class="pill bad">موقوف حتى يسدّد</span>':''}</dd><dt>عمولات هذا الشهر</dt><dd>${DA(x.month)}</dd>`})():`<dt>الرصيد المتاح</dt><dd>${DA(availOf(id))}</dd>`}<dt>التسليمات</dt><dd>${del}</dd><dt>إلغاءات بعد الحجز</dt><dd>${drops}${drops>=3?' <span class="pill bad">راقبه</span>':''}</dd><dt>التقييم</dt><dd>${r?`${r.avg.toFixed(1)} من 5 (${r.n})`:'لا تقييمات'}</dd></dl>
+    <dl class="kv"><dt>الهاتف</dt><dd>${tel(d.phone)}</dd><dt>سجّل</dt><dd>${when(d.createdAt)}</dd>${d.refBy?`<dt>دعاه</dt><dd>${esc(((Store.d.drivers||{})[d.refBy]||{}).name||d.refBy)}</dd>`:''}${d.deps&&d.deps.length?`<dt>مواعيده</dt><dd>${driverDepsHtml(d)}</dd>`:''}${monthly()?(()=>{const x=duesOf(id);return `<dt>عليه حالياً</dt><dd>${DA(x.debt)}${x.overdue?` (متأخر ${DA(x.overdue)})`:''}${x.blocked?' <span class="pill bad">موقوف حتى يسدّد</span>':''}</dd><dt>عمولات هذا الشهر</dt><dd>${DA(x.month)}</dd>`})():`<dt>الرصيد المتاح</dt><dd>${DA(availOf(id))}</dd>`}<dt>التسليمات</dt><dd>${del}</dd><dt>إلغاءات بعد الحجز</dt><dd>${drops}${drops>=3?' <span class="pill bad">راقبه</span>':''}</dd><dt>التقييم</dt><dd>${r?`${r.avg.toFixed(1)} من 5 (${r.n})`:'لا تقييمات'}</dd></dl>
     ${d.hasDoc?`<div class="field"><span>وثيقة الهوية</span>${lazyImg('kyc',id,'doc-img','وثيقة هوية السائق')}</div>`:`<p class="hint">${d.example?'سائق تجريبي، بلا وثيقة.':'لا توجد صورة وثيقة. تحقق منها مع السائق مباشرة.'}</p>`}
     <form id="adj-form" class="card form" data-id="${esc(id)}" novalidate style="background:var(--surface-2);box-shadow:none"><h3>سجّل حركة على رصيده</h3>
       <div class="chips"><input class="chip-in" type="radio" name="adjs" id="adj-cash" value="cash" checked><label class="chip" for="adj-cash">${monthly()?'دفع نقداً':'شحن نقدي استلمته'}</label><input class="chip-in" type="radio" name="adjs" id="adj-gift" value="gift"><label class="chip" for="adj-gift">هدية</label><input class="chip-in" type="radio" name="adjs" id="adj-debit" value="debit"><label class="chip" for="adj-debit">خصم</label></div>
       <div class="two"><label class="field"><span>المبلغ (دج)</span><input id="adj-amt" inputmode="numeric" dir="ltr" style="background:var(--surface)"></label><label class="field"><span>ملاحظة</span><input id="adj-why" maxlength="60" placeholder="مثال: دفع في محطة سكيكدة" style="background:var(--surface)"></label></div>
       <p class="form-err" id="adj-err" role="alert"></p><button class="btn primary" type="submit">سجّل الحركة</button></form>
-    ${L.length?`<h3>حركات الرصيد</h3><div class="rows">${L.map(x=>`<div class="row static"><span class="r1">${x.label}</span><span class="r3 n${x.amt>0?' plus':''}">${x.amt>0?'+':'−'}${DA(Math.abs(x.amt))}</span><span class="r2"><span dir="ltr">${esc(x.sub||'')}</span> · ${ago(x.t)}</span><span class="r3">${x.status!=='approved'?tpill(x.status):''}</span></div>`).join('')}</div>`:''}`);
+    ${L.length?`<h3>حركات الرصيد</h3><div class="rows">${L.map(x=>`<div class="row static"><span class="r1">${x.label}</span><span class="r3 n${x.amt>0?' plus':''}">${x.amt>0?'+':'−'}${DA(Math.abs(x.amt))}</span><span class="r2"><span dir="auto">${esc(x.sub||'')}</span> · ${ago(x.t)}</span><span class="r3">${x.status!=='approved'?tpill(x.status):''}</span></div>`).join('')}</div>`:''}`);
 }
 async function submitAdj(form){
   const id=form.dataset.id,err=$('#adj-err'),amt=num('#adj-amt'),kind=(document.querySelector('input[name="adjs"]:checked')||{}).value||'cash',why=$('#adj-why').value.trim();
@@ -1390,14 +1648,27 @@ const ACT={
   ddetail:d=>driverDetail(d.id),
   'save-pausemsg':async()=>{if(await savePatch({pauseMsg:$('#c-pausemsg').value.trim()}))toast('حُفظت رسالة الإيقاف.','ok')},
   'clear-announce':async()=>{if(await savePatch({announce:''})){const t=$('#c-announce');if(t)t.value='';toast('حُذف الإعلان.','ok')}},
+  'push-on':d=>enablePush({code:d.code||''}),
+  'push-off':()=>confirmSheet('إيقاف الإشعارات','لن تصلك تنبيهات كوليكار على هذا الهاتف. يمكنك تفعيلها من جديد في أي وقت.','أوقفها',async()=>{closeSheet();await disablePush()}),
+  'push-test':()=>testPush(),
+  'promo-apply':()=>applyPromo(false),
+  'deps-edit':()=>depsSheet(),
+  'dep-add':()=>{S.depRows=readDepRows();if(S.depRows.length>=6){toast('ستة مواعيد على الأكثر.');return}const last=S.depRows[S.depRows.length-1];S.depRows.push(last?{back:!last.back,days:last.days.slice(),t:last.t}:{back:false,days:[0,1,2,3,4],t:'07:00'});renderDepRows()},
+  'dep-del':d=>{S.depRows=readDepRows();S.depRows.splice(+d.i,1);renderDepRows()},
+  'share-drivers':d=>shareDriversSheet(d.id),
+  'promo-toggle':async d=>{const c=(Store.d.promos||{})[d.id];if(!c)return;const r=await call('promoSave',{promo:{code:c.id,amount:c.amount,max:c.max,first:c.first,keep:true,active:!c.active}});if(r.ok)toast(c.active?'أُوقف الكود.':'فُعّل الكود.','ok')},
+  'promo-del':d=>confirmSheet('حذف كود الخصم',`سيتوقف الكود <b dir="ltr">${esc(d.id)}</b> فوراً. الطرود التي استعملته لا تتأثر.`,'احذف الكود',async()=>{const r=await call('promoDel',{code:d.id});closeSheet();if(r.ok)toast('حُذف الكود.','ok')},true),
+  'backup-now':async()=>{const r=await call('backupNow');if(r.ok){Store.d.backup=r.result;const b=$('#backup-info');if(b)b.innerHTML=backupTxt();toast('حُفظت نسخة احتياطية في Google Drive.','ok')}},
   'del-examples':()=>confirmSheet('حذف الأمثلة','ستُحذف كل الطرود والسائقين وطلبات الشحن المعلّمة «مثال». بياناتك الحقيقية لا تُمس.','احذف الأمثلة',deleteExamples,true)
 };
 document.addEventListener('click',e=>{const a=e.target.closest('[data-act]');if(!a||a.tagName==='A')return;e.preventDefault();if(a.disabled)return;const f=ACT[a.dataset.act];if(!f)return;const res=f(a.dataset,a,e);if(res&&typeof res.then==='function'&&a.isConnected){a.classList.add('is-busy');res.finally(()=>a.classList.remove('is-busy'))}});
 document.addEventListener('submit',e=>{e.preventDefault();const f=e.target,id=f.id;let res=null;
-  if(id==='send-form')res=submitSend();else if(id==='reg-form')res=submitReg();else if(id==='topup-form')res=submitTopup();else if(id==='settings-form')res=submitPrices();else if(id==='collect-form')res=submitCollect();
+  if(id==='send-form'&&document.activeElement&&document.activeElement.id==='f-promo')res=applyPromo(false);
+  else if(id==='send-form')res=submitSend();else if(id==='reg-form')res=submitReg();else if(id==='topup-form')res=submitTopup();else if(id==='settings-form')res=submitPrices();else if(id==='collect-form')res=submitCollect();
   else if(id==='track-form')goTrack($('#t-code').value);else if(id==='quick-track')goTrack($('#qt-code').value);
   else if(id==='wilaya-form')res=submitWilayas();else if(id==='adj-form')res=submitAdj(f);
   else if(id==='adm-form')res=adminLogin();else if(id==='login-form')res=submitLogin();
+  else if(id==='deps-form')res=submitDeps();else if(id==='promo-form')res=submitPromo();
   else if(id==='announce-form'){const t=$('#c-announce').value.trim();res=savePatch({announce:t}).then(ok=>{if(ok)toast(t?'نُشر الإعلان عند كل المستخدمين.':'حُذف الإعلان.','ok')})}
   const b=f.querySelector('[type="submit"]');if(res&&b){b.disabled=true;res.finally(()=>{b.disabled=false})}});
 document.addEventListener('change',async e=>{
@@ -1415,7 +1686,8 @@ document.addEventListener('change',async e=>{
 document.addEventListener('input',e=>{const t=e.target;
   if(t.closest&&t.closest('#settings-form'))settingsExample();
   if(t.id==='ap-q'){S.apq=t.value;VIEWS['admin-parcels'].live()}
-  if(t.id==='ad-q'){S.adq=t.value;VIEWS['admin-drivers'].live()}});
+  if(t.id==='ad-q'){S.adq=t.value;VIEWS['admin-drivers'].live()}
+  if(t.id==='f-promo'&&S.promo){S.promo=null;const m=$('#promo-msg');if(m){m.textContent='';m.className='hint'}updateQuote()}});
 document.addEventListener('pointerover',e=>{const c=e.target.closest&&e.target.closest('.col');if(c)showTip(c)});
 document.addEventListener('pointerout',e=>{const c=e.target.closest&&e.target.closest('.col');if(c&&!(e.relatedTarget&&c.contains(e.relatedTarget)))hideTip()});
 document.addEventListener('focusin',e=>{const c=e.target.closest&&e.target.closest('.col');if(c)showTip(c)});
@@ -1429,6 +1701,7 @@ try{if(localStorage.getItem('kolicar.big')==='1')document.documentElement.classL
 async function firstLoad(){
   Store.loadErr='';if(!Store.ready)renderView(false);
   const r=await call('load',{},{silent:true,quiet:true});
+  if(r.ok)pushCheck().then(renderBells,()=>{});
   if(!r.ok&&!Store.ready){Store.loadErr=r.net?'net':(r.error||'');renderView(false);if(r.setup)toast(r.error,'bad')}
   schedulePoll();
 }
@@ -1441,11 +1714,16 @@ function start(){
   Store.adm=typeof adm==='string'?adm:'';
   const h=location.hash.slice(1);
   go(ROUTES[h]?h:roleHome(getRole()),{fromHash:!!ROUTES[h]});setBig(isBig());
-  /* links from outside: ?t=CODE opens tracking (sent to receivers), ?admin opens the control room */
-  /* links from outside: ?t=CODE opens tracking (sent to receivers), ?admin opens the control room */
+  /* links from outside: ?t=CODE opens tracking (sent to receivers), ?admin opens the control room,
+     ?ref=CODE fills a driver's invite code, ?promo=CODE fills a discount code */
   let q=null;try{q=new URLSearchParams(location.search)}catch(e){}
   if(q&&q.get('t'))goTrack(q.get('t'));else if(q&&q.has('admin'))go('admin');
   else if(hasServer()){try{google.script.url.getLocation(loc=>{const p=(loc&&loc.parameter)||{};if(p.t)goTrack(p.t);else if('admin' in p)go('admin')})}catch(e){}}
+  const clean=(v,n)=>String(v||'').toUpperCase().replace(/[^A-Z0-9]/g,'').slice(0,n);
+  if(q&&q.get('ref')&&clean(q.get('ref'),10)){lsSet('kolicar.ref',clean(q.get('ref'),10));if(!Store.me.driverId){setRole('driver');go('driver')}}
+  if(q&&q.get('promo')&&clean(q.get('promo'),16)){lsSet('kolicar.promo',clean(q.get('promo'),16));if(!getRole())setRole('customer');go('send')}
+  /* a tap on a notification while the app is open: go straight to what it is about */
+  if('serviceWorker' in navigator){try{navigator.serviceWorker.addEventListener('message',e=>{const m=e.data||{};if(m.kc!=='open'||!m.url)return;try{const u=new URL(m.url);const t=u.searchParams.get('t'),h=u.hash.slice(1);if(t)goTrack(t);else if(ROUTES[h])go(h)}catch(x){}poll()})}catch(e){}}
   /* the app shell is kept on the phone so it opens even without internet */
   if('serviceWorker' in navigator&&!hasServer()&&(location.protocol==='https:'||/^(127\.0\.0\.1|localhost)$/.test(location.hostname))){try{navigator.serviceWorker.register('sw.js').catch(()=>{})}catch(e){}}
   firstLoad();

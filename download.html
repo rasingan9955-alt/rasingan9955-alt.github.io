@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="theme-color" content="#EEF2F7">
+<title>حمّل تطبيق كوليكار لأندرويد</title>
+<meta name="description" content="حمّل تطبيق كوليكار لهواتف أندرويد: أرسل طرودك بين الولايات مع سائقي حافلات موثّقين.">
+<link rel="icon" href="icon-192.png">
+<link rel="manifest" href="manifest.webmanifest">
+<style>
+:root{--bg:#EEF2F7;--surface:#fff;--surface-2:#F1F4F9;--ink:#0F1A26;--ink-2:#26323F;--muted:#4D5A68;--line:#D3DBE5;--primary:#2B5FCC;--primary-ink:#fff;--primary-soft:#E8EFFC;--amber-soft:#FDF1DC;--ok:#11734A;color-scheme:light}
+@media (prefers-color-scheme:dark){:root{--bg:#0D1420;--surface:#152031;--surface-2:#1C2A3D;--ink:#EEF3F9;--ink-2:#D4DEE9;--muted:#A9B6C4;--line:#2B3B52;--primary:#7AA7FF;--primary-ink:#081733;--primary-soft:rgba(122,167,255,.16);--amber-soft:rgba(240,182,90,.14);--ok:#5CCB91;color-scheme:dark}}
+*{box-sizing:border-box}
+[hidden]{display:none!important}
+body{margin:0;background:var(--bg);color:var(--ink);font:17px/1.75 "Readex Pro","Segoe UI",Tahoma,Arial,sans-serif}
+main{max-width:640px;margin:0 auto;padding:24px 18px 48px;display:flex;flex-direction:column;gap:16px}
+.hero{display:flex;align-items:center;gap:16px;padding:20px;border-radius:24px;background:linear-gradient(160deg,var(--primary-soft),var(--surface) 75%);box-shadow:0 1px 2px rgba(15,26,38,.06),0 4px 14px rgba(15,26,38,.06)}
+.hero img{width:84px;height:84px;border-radius:20px;flex:none}
+h1{font-size:1.5rem;margin:0;line-height:1.3}
+h2{font-size:1.15rem;margin:0}
+p{margin:0;color:var(--ink-2)}
+.card{background:var(--surface);border-radius:20px;padding:20px;display:flex;flex-direction:column;gap:14px;box-shadow:0 1px 2px rgba(15,26,38,.06),0 4px 14px rgba(15,26,38,.06)}
+.btn{font:inherit;font-weight:600;font-size:1.1rem;border-radius:16px;padding:14px 20px;border:0;background:var(--primary);color:var(--primary-ink);cursor:pointer;display:flex;align-items:center;justify-content:center;gap:10px;text-decoration:none;min-height:56px;width:100%}
+.btn.ghost{background:var(--surface-2);color:var(--ink);font-weight:500}
+.btn svg{width:24px;height:24px;fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
+ol{margin:0;padding-inline-start:24px;display:flex;flex-direction:column;gap:8px}
+li{color:var(--ink-2)}
+.hint{font-size:.92rem;color:var(--muted)}
+.note{background:var(--amber-soft);border-radius:14px;padding:12px 14px;font-size:.95rem}
+.ok{color:var(--ok);font-weight:600}
+a{color:var(--primary)}
+.foot{display:flex;justify-content:center;gap:18px;flex-wrap:wrap;font-size:.92rem}
+.foot a{color:var(--muted)}
+</style>
+</head>
+<body>
+<main>
+<div class="hero"><img src="icon-192.png" alt=""><div><h1>تطبيق كوليكار لأندرويد</h1><p>أرسل كوليك مع الكار من ولاية لولاية، وتابعه خطوة بخطوة، وتصلك الإشعارات على هاتفك.</p></div></div>
+
+<section class="card" id="in-app" hidden>
+  <h2 class="ok">أنت تستعمل تطبيق كوليكار الآن</h2>
+  <p>لا تحتاج تحميل شيء. <a href="./">ارجع إلى التطبيق</a>.</p>
+</section>
+
+<section class="card" id="apk-card">
+  <h2>حمّل التطبيق</h2>
+  <a class="btn" id="apk-btn" href="kolicar.apk" download="kolicar.apk"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 4v11M7 10l5 5 5-5M5 20h14"/></svg><span>تحميل كوليكار (APK)</span></a>
+  <p class="hint" id="apk-size">ملف صغير لهواتف أندرويد.</p>
+  <ol>
+    <li>اضغط «تحميل»، وانتظر حتى ينتهي.</li>
+    <li>افتح الملف من الإشعارات أو من «التنزيلات».</li>
+    <li>إذا طلب الهاتف السماح بتثبيت التطبيقات من هذا المصدر، اضغط «الإعدادات» ثم فعّل «السماح»، وارجع.</li>
+    <li>اضغط «تثبيت»، ثم «فتح».</li>
+  </ol>
+  <p class="note">التطبيق ليس على Google Play بعد، لذلك قد يقول الهاتف إنه «تطبيق غير معروف». هذا عادي للتطبيقات المحمّلة من موقعها مباشرة. حمّله فقط من هذه الصفحة.</p>
+</section>
+
+<section class="card" id="apk-soon" hidden>
+  <h2>ملف التطبيق يُجهَّز</h2>
+  <p>ملف APK سيتوفّر هنا قريباً. يمكنك الآن تثبيت كوليكار مباشرة من المتصفح بالطريقة التالية، وهي تعمل مثل التطبيق تماماً.</p>
+</section>
+
+<section class="card">
+  <h2>أو ثبّته من المتصفح</h2>
+  <button class="btn ghost" id="pwa-btn" hidden>ثبّت كوليكار على هذا الهاتف</button>
+  <ol id="pwa-steps">
+    <li>افتح <a href="./">كوليكار</a> في متصفح Chrome.</li>
+    <li>اضغط زر القائمة ⋮ أعلى الشاشة.</li>
+    <li>اختر «تثبيت التطبيق» أو «إضافة إلى الشاشة الرئيسية».</li>
+  </ol>
+  <p class="hint">على iPhone: افتح كوليكار في Safari، اضغط زر المشاركة، ثم «إضافة إلى الشاشة الرئيسية».</p>
+</section>
+
+<div class="foot"><a href="./">افتح كوليكار</a><a href="terms.html">شروط الاستعمال</a><a href="privacy.html">سياسة الخصوصية</a></div>
+</main>
+<script>
+(function(){
+  var standalone=false;try{standalone=matchMedia('(display-mode: standalone)').matches||String(document.referrer).indexOf('android-app://')===0}catch(e){}
+  if(standalone){document.getElementById('in-app').hidden=false;document.getElementById('apk-card').hidden=true}
+  /* the APK is uploaded by the owner next to this page; until then, show the browser install */
+  if(window.fetch&&!standalone){fetch('kolicar.apk',{method:'HEAD',cache:'no-store'}).then(function(r){
+    if(!r.ok){document.getElementById('apk-card').hidden=true;document.getElementById('apk-soon').hidden=false;return}
+    var n=+r.headers.get('content-length')||0;if(n>0)document.getElementById('apk-size').textContent='الحجم: '+(n/1048576).toFixed(1).replace('.',',')+' ميغابايت، لهواتف أندرويد.';
+  }).catch(function(){})}
+  var deferred=null,btn=document.getElementById('pwa-btn');
+  window.addEventListener('beforeinstallprompt',function(e){e.preventDefault();deferred=e;btn.hidden=false});
+  btn.addEventListener('click',function(){if(!deferred)return;deferred.prompt();deferred.userChoice.then(function(){deferred=null;btn.hidden=true})});
+  window.addEventListener('appinstalled',function(){btn.hidden=true});
+  if('serviceWorker' in navigator&&location.protocol==='https:'){try{navigator.serviceWorker.register('sw.js').catch(function(){})}catch(e){}}
+})();
+</script>
+</body>
+</html>
