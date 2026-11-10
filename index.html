@@ -2,14 +2,21 @@
 <html lang="ar" dir="rtl">
 <head>
 <meta charset="utf-8">
+<script>/* اللغة تتبع لغة الهاتف: العربية أو الفرنسية، ويمكن تغييرها من أسفل الصفحة الرئيسية */
+(function(){var PAGE='ar',TWIN='fr.html';try{var l=localStorage.getItem('kolicar.lang');if(l!=='ar'&&l!=='fr'){l='ar';var a=navigator.languages&&navigator.languages.length?navigator.languages:[navigator.language||''];for(var i=0;i<a.length;i++){var c=String(a[i]).slice(0,2).toLowerCase();if(c==='ar'||c==='fr'){l=c;break}}}if(l!==PAGE)location.replace(TWIN+location.search+location.hash)}catch(e){}})();</script>
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<meta name="theme-color" content="#EEF2F7" media="(prefers-color-scheme: light)">
+<meta name="theme-color" content="#F2F5FA" media="(prefers-color-scheme: light)">
 <meta name="theme-color" content="#0D1420" media="(prefers-color-scheme: dark)">
 <meta name="description" content="أرسل طرودك بين الولايات مع سائقي حافلات موثّقين، برموز أمان للاستلام والتسليم.">
 <link rel="manifest" href="manifest.webmanifest">
-<link rel="apple-touch-icon" href="icon-192.png">
+<link rel="apple-touch-icon" sizes="180x180" href="apple-touch-icon.png">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="كوليكار">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<meta name="format-detection" content="telephone=no">
 <title>كوليكار</title>
-<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 120 120'%3E%3Cpath d='M60 31 86 43 60 55 34 43Z' fill='%236E9BF0'/%3E%3Cpath d='M34 43 60 55 60 85 34 73Z' fill='%233E76E0'/%3E%3Cpath d='M60 55 86 43 86 73 60 85Z' fill='%232A5BC4'/%3E%3C/svg%3E">
+<link rel="icon" href="icon-192.png">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Readex+Pro:wght@300;400;500;600;700&display=swap" rel="stylesheet">
@@ -105,6 +112,9 @@ section{display:flex;flex-direction:column;gap:12px}
 .list{display:flex;flex-direction:column;gap:14px}
 .empty{background:var(--surface);border-radius:var(--r);box-shadow:var(--shadow);padding:24px 18px;text-align:center;color:var(--muted);font-size:1rem;display:flex;flex-direction:column;align-items:center;gap:14px}
 .hint{font-size:.92rem;color:var(--muted);line-height:1.65}
+.ios-card .ios-head{display:flex;align-items:center;justify-content:space-between;gap:12px}
+.ios-card .x{width:40px;height:40px}
+.ios-share .ic{width:20px;height:20px;vertical-align:-4px;color:var(--primary)}
 .center{text-align:center}
 
 /* home */
@@ -428,27 +438,102 @@ nav.tabs{display:grid;margin:0 12px 12px;padding:6px;background:var(--surface);b
 .row .r4{grid-column:1/-1}
 .row .r4 .actions{gap:6px}
 @media (prefers-reduced-motion: reduce){*,*::before,*::after{animation:none!important;transition:none!important}}
+
+/* ================= v3 look =================
+   The bus at night: deep navy for the two places that carry the brand (the home panel and the balance),
+   line-blue for actions, gold for the driver and the card. Parcels look like bus tickets. Everything else stays quiet. */
+:root{
+  --bg:#F2F5FA; --surface-2:#EEF2F8;
+  --ink:#0B1730; --ink-2:#22304A; --muted:#566377; --line:#D5DDE9;
+  --primary:#1F56D8; --primary-soft:#E6EEFD;
+  --navy:#0C1F4A; --navy-2:#1A3F9C; --gold:#F0B23A; --gold-ink:#3A2600;
+  --shadow:0 1px 2px rgba(11,23,48,.05),0 6px 18px rgba(11,23,48,.07);
+  --edge:color-mix(in srgb,var(--line) 75%,transparent);
+  --r:22px;
+}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){--navy:#0A1836;--navy-2:#17367F;--gold:#F0B65A;--gold-ink:#2B1C00;--edge:color-mix(in srgb,var(--line) 85%,transparent)}
+}
+.app{background:linear-gradient(180deg,color-mix(in srgb,var(--primary) 9%,var(--bg)) 0,var(--bg) 240px)}
+h1{font-weight:700}
+h2{font-weight:650}
+.wordmark{font-weight:700}
+.logo{width:50px;height:50px}
+.card,.pcard,.stat,.empty,.role-tile,.bell{border:1px solid var(--edge)}
+.sheet .card,.sheet .bell,.card .bell,.stat.hl{border:0}
+
+/* home panel: the box flies a route between two stops */
+.hero-card{position:relative;overflow:hidden;flex-shrink:0;color:#fff;border-radius:26px;padding:22px 22px 40px;background:linear-gradient(150deg,var(--navy-2),var(--navy) 78%);box-shadow:0 12px 28px rgba(12,31,74,.30)}
+.hero-card h1{color:#fff;font-size:1.6rem}
+.hero-card p{color:#D3DEF6}
+.hero-logo{width:104px;height:104px;filter:drop-shadow(0 6px 10px rgba(0,0,0,.25))}
+.hero-card::before{content:"";position:absolute;inset-inline:22px;bottom:19px;height:3px;border-radius:2px;background:repeating-linear-gradient(90deg,rgba(255,255,255,.5) 0 8px,transparent 8px 14px)}
+.hero-card::after{content:"";position:absolute;inset-inline:16px;bottom:14px;height:13px;background:radial-gradient(circle at calc(100% - 6.5px) 50%,var(--navy) 3px,#fff 3.5px 6px,transparent 6.5px),radial-gradient(circle at 6.5px 50%,var(--gold) 6px,transparent 6.5px)}
+[dir="ltr"] .hero-card::after{transform:scaleX(-1)}
+
+/* who are you: two big doors */
+.role-tile{border-radius:22px;padding:18px;box-shadow:var(--shadow)}
+.rt-icon{background:var(--primary);color:var(--primary-ink);border-radius:20px;box-shadow:0 6px 14px color-mix(in srgb,var(--primary) 30%,transparent)}
+.role-tile.driver .rt-icon{background:var(--gold);color:var(--gold-ink);box-shadow:0 6px 14px color-mix(in srgb,var(--gold) 35%,transparent)}
+.rt-title{font-weight:700}
+[dir="ltr"] .rt-go .ic{transform:scaleX(-1)}
+
+/* actions */
+.btn{font-weight:600}
+.btn.primary{background:linear-gradient(180deg,color-mix(in srgb,var(--primary) 86%,#fff),var(--primary));box-shadow:0 6px 14px color-mix(in srgb,var(--primary) 30%,transparent),inset 0 1px 0 rgba(255,255,255,.2)}
+.btn.primary:active{transform:translateY(1px);box-shadow:0 2px 6px color-mix(in srgb,var(--primary) 30%,transparent)}
+.btn.sm.primary{box-shadow:0 3px 8px color-mix(in srgb,var(--primary) 26%,transparent)}
+input,select,textarea{background:var(--surface);border-color:var(--edge)}
+.searchbar input,.searchbar input:focus{border-color:transparent}
+.sheet input,.sheet select,.sheet textarea{background:var(--surface)}
+
+/* balance: the second navy place */
+.stat.hl{background:linear-gradient(150deg,var(--navy-2),var(--navy) 80%);box-shadow:0 10px 22px rgba(12,31,74,.26)}
+.stat.hl .k,.stat.hl .s,.stat.hl .v{color:#fff}
+.stat .v{font-weight:700}
+
+/* a parcel is a ticket: two notches where the stub tears off */
+.pcard{position:relative;overflow:hidden;flex-shrink:0}
+.pc-foot{position:relative}
+.pc-foot::before,.pc-foot::after{content:"";position:absolute;top:-11px;width:20px;height:20px;border-radius:50%;background:var(--bg);border:1px solid var(--edge);box-sizing:border-box}
+.pc-foot::before{inset-inline-start:-29px}
+.pc-foot::after{inset-inline-end:-29px}
+.sheet .pc-foot::before,.sheet .pc-foot::after{display:none}
+.route .dot.d{background:var(--gold);box-shadow:0 0 0 3px color-mix(in srgb,var(--gold) 28%,transparent)}
+.route.both .dot.d{background:var(--primary);box-shadow:none}
+
+/* tabs: the current place is a filled pill */
+nav.tabs{border-radius:26px;box-shadow:0 8px 26px rgba(11,23,48,.14),0 0 0 1px var(--edge)}
+.tab{border-radius:20px}
+.tab[aria-current="page"]{background:var(--primary-soft);font-weight:700}
+.tab[aria-current="page"] .ic{background:transparent}
+
+/* paying: the gold card, the two ways, the account number to copy */
+.gold-card{display:inline-block;position:relative;flex:none;width:44px;height:29px;border-radius:6px;background:linear-gradient(135deg,#F9DD86,#E2A82B 60%,#C98A12);box-shadow:inset 0 0 0 1px rgba(120,80,0,.25),0 1px 2px rgba(0,0,0,.15)}
+.gold-card i{position:absolute;inset-inline-start:6px;top:8px;width:10px;height:8px;border-radius:2px;background:linear-gradient(135deg,#FFF3C4,#D6A73A);box-shadow:0 0 0 1px rgba(120,80,0,.35)}
+.gold-card::after{content:"";position:absolute;inset-inline:6px;bottom:5px;height:3px;border-radius:2px;background:rgba(120,80,0,.35)}
+.chips.pm{flex-direction:column}
+.chips.pm .chip{flex-direction:row;align-items:center;gap:12px;padding:12px 14px}
+.chips.pm .chip>span:last-child{display:flex;flex-direction:column}
+.chips.pm .chip .ic{width:28px;height:28px;margin-inline:8px;color:var(--muted)}
+.pm-box{display:flex;flex-direction:column;gap:14px}
+#topup-form[data-pm="card"] .pm-box[data-for="bm"],#topup-form[data-pm="bm"] .pm-box[data-for="card"]{display:none}
+.rip{display:inline-flex;align-items:center;gap:10px;flex-wrap:wrap;margin-top:6px}
+.rip b{font-size:1.1rem;background:var(--surface-2);padding:6px 10px;border-radius:10px;word-break:break-all}
+.btn .gold-card{width:38px;height:25px}
+.btn .gold-card i{top:7px;width:9px;height:7px}
+
+/* left-to-right pages (French) */
+[dir="ltr"] .code-in,[dir="ltr"] .promo-row input{text-align:left}
+[dir="ltr"] .toggle input::after{right:auto;left:3px}
+[dir="ltr"] .toggle input:checked::after{transform:translateX(24px)}
 </style>
 </head>
 <body>
 <div class="busy" id="busy" hidden></div>
 <div class="app">
   <header class="appbar" id="top">
-    <div class="brand"><svg class="logo" viewBox="0 0 120 120" aria-hidden="true"><g transform="translate(0 3)"><g stroke-linecap="round" fill="none" stroke-width="8">
-      <path d="M44 47C31 38 20 32 9 28.5" stroke="#9CBBF4"/>
-      <path d="M44 55.5C33 49.5 23 45.5 12.5 43" stroke="#B6CDF7"/>
-      <path d="M44 64C35 60.5 27 58.5 18 57.5" stroke="#C4D7F8"/>
-    </g><g transform="matrix(-1 0 0 1 120 0)"><g stroke-linecap="round" fill="none" stroke-width="8">
-      <path d="M44 47C31 38 20 32 9 28.5" stroke="#9CBBF4"/>
-      <path d="M44 55.5C33 49.5 23 45.5 12.5 43" stroke="#B6CDF7"/>
-      <path d="M44 64C35 60.5 27 58.5 18 57.5" stroke="#C4D7F8"/>
-    </g></g><g stroke-linejoin="round" stroke-width="2.4">
-      <path d="M60 31 86 43 60 55 34 43Z" fill="#6E9BF0" stroke="#6E9BF0"/>
-      <path d="M34 43 60 55 60 85 34 73Z" fill="#3E76E0" stroke="#3E76E0"/>
-      <path d="M60 55 86 43 86 73 60 85Z" fill="#2A5BC4" stroke="#2A5BC4"/>
-      <path d="M43.2 39.5 50.8 36 76.8 48 69.2 51.5Z" fill="#9DBDF6"/>
-      <path d="M69.2 51.5 76.8 48 76.8 78 69.2 81.5Z" fill="#4F80DB"/>
-    </g></g></svg><span class="wordmark">كوليكار</span><span id="app-label" class="app-label" hidden></span></div>
+    <div class="brand"><svg class="logo" viewBox="0 0 120 120" aria-hidden="true"><g transform="translate(0 4)"><path d="M41 47C31 31 19 22 4 18 12 29 23 42 37 55Z" fill="#7EA7F6"/><path d="M39 55C28 43 16 37 2 36 11 44 22 53 36 62Z" fill="#A3C1F9"/><path d="M38 63C29 56 19 53 8 54 16 59 25 63 36 69Z" fill="#C6D9FC"/><g transform="matrix(-1 0 0 1 120 0)"><path d="M41 47C31 31 19 22 4 18 12 29 23 42 37 55Z" fill="#7EA7F6"/><path d="M39 55C28 43 16 37 2 36 11 44 22 53 36 62Z" fill="#A3C1F9"/><path d="M38 63C29 56 19 53 8 54 16 59 25 63 36 69Z" fill="#C6D9FC"/></g><g stroke-linejoin="round" stroke-width="2.4"><path d="M60 30 88 43 60 56 32 43Z" fill="#7CA6F4" stroke="#7CA6F4"/><path d="M32 43 60 56 60 88 32 75Z" fill="#3A74E4" stroke="#3A74E4"/><path d="M60 56 88 43 88 75 60 88Z" fill="#2253C4" stroke="#2253C4"/><path d="M41.5 38.6 50 34.6 78 47.6 69.5 51.6Z" fill="#F6BC4A"/><path d="M69.5 51.6 78 47.6 78 61 69.5 65Z" fill="#E0A024"/></g></g></svg><span class="wordmark">كوليكار</span><span id="app-label" class="app-label" hidden></span></div>
     <div class="bar-actions">
       <button class="conn" id="conn" data-act="conn-info"><i></i><span>…</span></button>
       <button class="role-btn" id="role-btn" data-act="switch-role" hidden>تغيير الدور</button>
@@ -498,7 +583,7 @@ const EV_SHORT={created:'طرد جديد',accepted:'حجزه سائق',unassigne
 const pill=s=>{const m=ST[s]||{l:s,c:'mute'};return `<span class="pill ${m.c}">${m.l}</span>`};
 const DST={pending:{l:'قيد المراجعة',c:'warn'},verified:{l:'موثّق',c:'ok'},rejected:{l:'مرفوض',c:'bad'},suspended:{l:'موقوف',c:'bad'}};
 const dpill=s=>{const m=DST[s]||DST.pending;return `<span class="pill ${m.c}">${m.l}</span>`};
-const TST={pending:{l:'قيد التأكد',c:'warn'},approved:{l:'أُضيف',c:'ok'},rejected:{l:'مرفوض',c:'bad'}};
+const TST={paying:{l:'بانتظار الدفع',c:'info'},pending:{l:'قيد التأكد',c:'warn'},approved:{l:'أُضيف',c:'ok'},rejected:{l:'مرفوض',c:'bad'}};
 const tpill=s=>{const m=TST[s]||TST.pending;return `<span class="pill ${m.c}">${m.l}</span>`};
 const MAX_FAIL=5,LATE_H=12,LIVE=['picked','arrived','delivered'],ACTIVE=['accepted','picked','arrived'];
 const PARCELS=['طرد واحد','طردان','طرود','طرداً','لا طرود'];
@@ -533,34 +618,25 @@ const ICON={
   gift:'<rect x="4" y="9" width="16" height="11" rx="2"/><path d="M4 13h16M12 9v11"/><path d="M12 9c-1.5-3.5-5-3.5-5-1.2C7 9 9 9 12 9Zm0 0c1.5-3.5 5-3.5 5-1.2C17 9 15 9 12 9Z"/>',
   phone:'<path d="M5.5 4h3.2l1.8 4.6-2.3 1.4a11.5 11.5 0 0 0 5.8 5.8l1.4-2.3 4.6 1.8v3.2a2 2 0 0 1-2.1 2A16.5 16.5 0 0 1 3.5 6.1 2 2 0 0 1 5.5 4Z"/>',
   safe:'<path d="M12 3 4.5 6v5.5c0 4.6 3.2 8.4 7.5 9.5 4.3-1.1 7.5-4.9 7.5-9.5V6L12 3Z"/>',
+  share:'<path d="M12 3.5v11"/><path d="M8 7.5l4-4 4 4"/><path d="M8 10.5H6.5A1.5 1.5 0 0 0 5 12v7a1.5 1.5 0 0 0 1.5 1.5h11A1.5 1.5 0 0 0 19 19v-7a1.5 1.5 0 0 0-1.5-1.5H16"/>',
   bell:'<path d="M6 16.5V11a6 6 0 0 1 12 0v5.5l1.6 2.2H4.4L6 16.5Z"/><path d="M10 21a2.2 2.2 0 0 0 4 0"/>',
   clock:'<circle cx="12" cy="12" r="8.5"/><path d="M12 7.5V12l3 2"/>'
 };
-const LOGO=`<g transform="translate(0 3)"><g stroke-linecap="round" fill="none" stroke-width="8">
-      <path d="M44 47C31 38 20 32 9 28.5" stroke="#9CBBF4"/>
-      <path d="M44 55.5C33 49.5 23 45.5 12.5 43" stroke="#B6CDF7"/>
-      <path d="M44 64C35 60.5 27 58.5 18 57.5" stroke="#C4D7F8"/>
-    </g><g transform="matrix(-1 0 0 1 120 0)"><g stroke-linecap="round" fill="none" stroke-width="8">
-      <path d="M44 47C31 38 20 32 9 28.5" stroke="#9CBBF4"/>
-      <path d="M44 55.5C33 49.5 23 45.5 12.5 43" stroke="#B6CDF7"/>
-      <path d="M44 64C35 60.5 27 58.5 18 57.5" stroke="#C4D7F8"/>
-    </g></g><g stroke-linejoin="round" stroke-width="2.4">
-      <path d="M60 31 86 43 60 55 34 43Z" fill="#6E9BF0" stroke="#6E9BF0"/>
-      <path d="M34 43 60 55 60 85 34 73Z" fill="#3E76E0" stroke="#3E76E0"/>
-      <path d="M60 55 86 43 86 73 60 85Z" fill="#2A5BC4" stroke="#2A5BC4"/>
-      <path d="M43.2 39.5 50.8 36 76.8 48 69.2 51.5Z" fill="#9DBDF6"/>
-      <path d="M69.2 51.5 76.8 48 76.8 78 69.2 81.5Z" fill="#4F80DB"/>
-    </g></g>`;
+const LOGO=`<g transform="translate(0 4)"><path d="M41 47C31 31 19 22 4 18 12 29 23 42 37 55Z" fill="#7EA7F6"/><path d="M39 55C28 43 16 37 2 36 11 44 22 53 36 62Z" fill="#A3C1F9"/><path d="M38 63C29 56 19 53 8 54 16 59 25 63 36 69Z" fill="#C6D9FC"/><g transform="matrix(-1 0 0 1 120 0)"><path d="M41 47C31 31 19 22 4 18 12 29 23 42 37 55Z" fill="#7EA7F6"/><path d="M39 55C28 43 16 37 2 36 11 44 22 53 36 62Z" fill="#A3C1F9"/><path d="M38 63C29 56 19 53 8 54 16 59 25 63 36 69Z" fill="#C6D9FC"/></g><g stroke-linejoin="round" stroke-width="2.4"><path d="M60 30 88 43 60 56 32 43Z" fill="#7CA6F4" stroke="#7CA6F4"/><path d="M32 43 60 56 60 88 32 75Z" fill="#3A74E4" stroke="#3A74E4"/><path d="M60 56 88 43 88 75 60 88Z" fill="#2253C4" stroke="#2253C4"/><path d="M41.5 38.6 50 34.6 78 47.6 69.5 51.6Z" fill="#F6BC4A"/><path d="M69.5 51.6 78 47.6 78 61 69.5 65Z" fill="#E0A024"/></g></g>`;
+const LOGO_W=`<g transform="translate(0 4)"><path d="M41 47C31 31 19 22 4 18 12 29 23 42 37 55Z" fill="#FFFFFF"/><path d="M39 55C28 43 16 37 2 36 11 44 22 53 36 62Z" fill="#D6E4FF"/><path d="M38 63C29 56 19 53 8 54 16 59 25 63 36 69Z" fill="#AEC8FF"/><g transform="matrix(-1 0 0 1 120 0)"><path d="M41 47C31 31 19 22 4 18 12 29 23 42 37 55Z" fill="#FFFFFF"/><path d="M39 55C28 43 16 37 2 36 11 44 22 53 36 62Z" fill="#D6E4FF"/><path d="M38 63C29 56 19 53 8 54 16 59 25 63 36 69Z" fill="#AEC8FF"/></g><g stroke-linejoin="round" stroke-width="2.4"><path d="M60 30 88 43 60 56 32 43Z" fill="#B4CEFF" stroke="#B4CEFF"/><path d="M32 43 60 56 60 88 32 75Z" fill="#6C9AF8" stroke="#6C9AF8"/><path d="M60 56 88 43 88 75 60 88Z" fill="#4479EC" stroke="#4479EC"/><path d="M41.5 38.6 50 34.6 78 47.6 69.5 51.6Z" fill="#F6BC4A"/><path d="M69.5 51.6 78 47.6 78 61 69.5 65Z" fill="#E0A024"/></g></g>`;
+const LANG='ar';
+/* a small drawn gold card: stands for the Edahabia card without using anyone's logo */
+const GOLD='<span class="gold-card" aria-hidden="true"><i></i></span>';
 const callBtn=(p,label)=>`<a class="btn sm call" href="tel:${esc(normPhone(p))}">${svg('phone')}<span>${label}</span><span dir="ltr">${esc(fmtPhone(p))}</span></a>`;
 const svg=n=>`<svg viewBox="0 0 24 24" class="ic" aria-hidden="true">${ICON[n]}</svg>`;
 const routeLine=(f,t,cls='')=>`<div class="route ${cls}"><span class="stop"><i class="dot o"></i><b>${esc(wn(f))}</b></span><span class="track"><span class="sr">${cls.includes('both')?'و':'إلى'}</span></span><span class="stop"><i class="dot d"></i><b>${esc(wn(t))}</b></span></div>`;
 
 /* ================= server link: every rule is enforced on the server, this phone only shows the result ================= */
 const LS_ME='kolicar.pilot.me',LS_ADM='kolicar.pilot.adm',ROLE_KEY='kolicar.role';
-const emptyData=()=>({parcels:{},drivers:{},topups:{},verify:{},approvals:{},settings:null,admin:false,demoAvailable:false,appUrl:'',sheetUrl:'',driverLost:false,push:'',deps:{},promos:{},backup:null});
+const emptyData=()=>({parcels:{},drivers:{},topups:{},verify:{},approvals:{},settings:null,admin:false,demoAvailable:false,appUrl:'',sheetUrl:'',driverLost:false,push:'',deps:{},promos:{},backup:null,card:''});
 const emptyMe=()=>({key:'',driverId:null,sent:{},name:'',phone:'',tracked:[],push:null});
 const Store={d:emptyData(),me:emptyMe(),ver:'',ready:false,online:true,adm:'',note:'',
-  get settings(){const s=this.d.settings||{};return {...DEFAULT_SETTINGS,...s,base:{...DEFAULT_SETTINGS.base,...(s.base||{})}}}
+  get settings(){const s=this.d.settings||{};return {...DEFAULT_SETTINGS,...s,base:{...DEFAULT_SETTINGS.base,...(s.base||{})},card:this.d.card||''}}
 };
 const adminAllowed=()=>!!Store.d.admin;
 function lsGet(k){try{const r=localStorage.getItem(k);return r?JSON.parse(r):null}catch(e){return null}}
@@ -599,12 +675,16 @@ function setBusy(on){busyN=Math.max(0,busyN+(on?1:-1));clearTimeout(busyT);const
 function setOnline(on){if(Store.online===on)return;Store.online=on;renderChrome()}
 const auth=()=>{const a={key:Store.me.key,driverId:Store.me.driverId};if(Store.adm)a.admin=Store.adm;return a};
 /* one call to the server: shows progress, refreshes data, explains errors in plain words */
+/* server messages arrive in Arabic; the French build carries their French twins */
+const SRV=/*@SRV@*/null;
+function srvMsg(m){if(!SRV||typeof m!=='string')return m;if(SRV.x[m])return SRV.x[m];for(const [re,f] of SRV.p){const k=new RegExp(re).exec(m);if(k)return f.replace(/\$(\d)/g,(_,n)=>k[+n]||'')}return m}
 async function call(action,p={},o={}){
   const mut=!READS.has(action);
   if(mut&&mutating){if(!o.quiet)toast('لحظة، العملية السابقة لم تنته بعد.');return {ok:false,busy:true}}
   if(mut)mutating=true;if(!o.silent)setBusy(true);
   const params={...auth(),...p};
   let r;try{r=await rawCall(action,params)}finally{if(mut)mutating=false;if(!o.silent)setBusy(false)}
+  if(r&&r.error)r.error=srvMsg(r.error);if(r&&r.result&&typeof r.result==='object'){if(typeof r.result.error==='string')r.result.error=srvMsg(r.result.error);if(typeof r.result.err==='string')r.result.err=srvMsg(r.result.err)}
   if(r.ok){setOnline(true);if(r.data)applyData(r.data,r.ver,params,o.force)}
   else if(r.net){setOnline(false);if(!o.quiet)toast('تعذر الاتصال. تحقق من الإنترنت ثم أعد المحاولة.','bad')}
   else if(!o.quiet&&!r.busy)toast(r.error||'حدث خطأ. أعد المحاولة.','bad');
@@ -616,7 +696,7 @@ function applyData(d,ver,sent,force){
   const first=!Store.ready,was=Store.d.admin;
   Store.d={...emptyData(),...d};if(ver)Store.ver=ver;Store.ready=true;
   if(sent&&sent.admin&&sent.admin===Store.adm&&!Store.d.admin){Store.adm='';lsDel(LS_ADM);toast('كلمة سر الإدارة تغيّرت. ادخل من جديد.','bad')}
-  if(first||was!==Store.d.admin)go(S.route,{keepScroll:true});else refreshLive();
+  if(first||was!==Store.d.admin)go((first&&S.want)||S.route,{keepScroll:true});else refreshLive();
   maybeSyncPush();
 }
 async function savePatch(patch){const r=await call('settings',{patch});return !!r.ok}
@@ -625,11 +705,14 @@ async function savePatch(patch){const r=await call('settings',{patch});return !!
    The server sends an empty "ring" through the browser's push service; the phone then asks the server
    for the text (sw.js). Nothing personal ever passes through Google's or Mozilla's push service. */
 const Push={state:'?',ep:'',busy:false};
-const isApp=()=>{try{return matchMedia('(display-mode: standalone)').matches||String(document.referrer).startsWith('android-app://')}catch(e){return false}};
+const isApp=()=>{try{return matchMedia('(display-mode: standalone)').matches||navigator.standalone===true||String(document.referrer).startsWith('android-app://')}catch(e){return false}};
+const isIOS=()=>{const u=navigator.userAgent||'';return /iPhone|iPad|iPod/.test(u)||(/Macintosh/.test(u)&&(navigator.maxTouchPoints||0)>1)};
+/* in-app browsers (Facebook, Instagram, TikTok…) cannot add a site to the Home Screen: open it in Safari first */
+const inAppBrowser=()=>/FBAN|FBAV|FB_IAB|Instagram|Snapchat|TikTok|musical_ly|BytedanceWebview|Line\/|GSA\//.test(navigator.userAgent||'');
 const pushCapable=()=>'serviceWorker' in navigator&&'PushManager' in window&&'Notification' in window&&!hasServer()&&window.isSecureContext!==false;
 function b64uBytes(v){v=String(v||'').replace(/-/g,'+').replace(/_/g,'/');while(v.length%4)v+='=';const r=atob(v),o=new Uint8Array(r.length);for(let i=0;i<r.length;i++)o[i]=r.charCodeAt(i);return o}
 function bytesB64u(buf){if(!buf)return '';const a=new Uint8Array(buf);let v='';a.forEach(b=>v+=String.fromCharCode(b));return btoa(v).replace(/\+/g,'-').replace(/\//g,'_').replace(/=+$/,'')}
-const shortUA=()=>{const u=navigator.userAgent||'';return ((/Android/.test(u)?'Android':/iPhone|iPad/.test(u)?'iPhone':/Windows/.test(u)?'Windows':/Mac/.test(u)?'Mac':'')+(isApp()?' app':/Firefox\//.test(u)?' Firefox':/Chrome\//.test(u)?' Chrome':/Safari\//.test(u)?' Safari':'')).trim()};
+const shortUA=()=>{const u=navigator.userAgent||'';return ((/Android/.test(u)?'Android':isIOS()?'iPhone':/Windows/.test(u)?'Windows':/Mac/.test(u)?'Mac':'')+(isApp()?' app':/Firefox\//.test(u)?' Firefox':/Chrome\//.test(u)?' Chrome':/Safari\//.test(u)?' Safari':'')).trim()};
 async function swReg(){
   if(!pushCapable())return null;
   let r=null;try{r=await navigator.serviceWorker.getRegistration()}catch(e){}
@@ -657,7 +740,7 @@ const pushSig=()=>[Push.ep,Store.me.driverId||'',Store.adm?'a':''].join('|');
 async function enablePush(o={}){
   if(Push.busy)return false;
   if(!Store.d.push){toast('الإشعارات غير مفعّلة في الخادم بعد.','bad');return false}
-  if(!pushCapable()){toast(pushHelp('unsupported'),'bad');return false}
+  if(!pushCapable()){if(isIOS()&&!isApp())iosHowSheet();else toast(pushHelp('unsupported'),'bad');return false}
   Push.busy=true;
   try{
     let perm=Notification.permission;
@@ -700,10 +783,20 @@ async function syncPush(){
   if(res.ok){Store.me.push={...Store.me.push,ep:x.endpoint,sig:pushSig()};saveMe();Push.state='on'}
 }
 function pushHelp(st){
-  if(st==='denied')return 'الإشعارات محظورة لكوليكار على هذا الهاتف. افتح الإعدادات ← التطبيقات ← Chrome (أو كوليكار) ← الإشعارات، واسمح بها.';
+  const ios=isIOS();
+  if(st==='denied')return ios?'الإشعارات محظورة لكوليكار. افتح الإعدادات ← الإشعارات ← كوليكار، وفعّل «السماح بالإشعارات».':'الإشعارات محظورة لكوليكار على هذا الهاتف. افتح الإعدادات ← التطبيقات ← Chrome (أو كوليكار) ← الإشعارات، واسمح بها.';
   if(st==='dismissed')return 'لم تسمح بالإشعارات. اضغط «فعّل الإشعارات» من جديد ثم «السماح».';
-  return /iPhone|iPad/.test(navigator.userAgent||'')?'على iPhone: افتح كوليكار في Safari، اضغط زر المشاركة ثم «إضافة إلى الشاشة الرئيسية»، وافتحه من هناك لتفعيل الإشعارات.':'هذا المتصفح لا يدعم الإشعارات. افتح كوليكار في Chrome، أو حمّل تطبيق أندرويد.';
+  if(ios)return isApp()?'لتصلك الإشعارات على iPhone حدّث النظام إلى iOS 16.4 أو أحدث: الإعدادات ← عام ← تحديث البرنامج.':'على iPhone تصل الإشعارات بعد إضافة كوليكار إلى الشاشة الرئيسية، ثم فتحه من أيقونته.';
+  return 'هذا المتصفح لا يدعم الإشعارات. افتح كوليكار في Chrome، أو حمّل تطبيق أندرويد.';
 }
+/* iPhone: Kolicar is installed from Safari with «إضافة إلى الشاشة الرئيسية»; opened from its icon it runs full screen and gets notifications (iOS 16.4+) */
+function iosSteps(){return `<ol class="how">${inAppBrowser()?'<li><span>افتح هذا الرابط في <b>Safari</b>: اضغط ⋯ ثم «فتح في Safari».</span></li>':''}<li><span>اضغط زر <b>المشاركة</b> <span class="ios-share">${svg('share')}</span>. في iOS 26 تجده بعد الضغط على <b>⋯</b> بجانب شريط العنوان.</span></li><li><span>مرّر القائمة واختر <b>«إضافة إلى الشاشة الرئيسية»</b>، ثم «إضافة».</span></li><li><span>افتح كوليكار من أيقونته الجديدة، وفعّل الإشعارات.</span></li></ol>`}
+function iosCard(){
+  if(!isIOS()||isApp())return '';
+  const t=+lsGet('kolicar.iosHint')||0;if(Date.now()-t<30*864e5)return '';
+  return `<section class="card ios-card"><div class="ios-head"><h2>ثبّت كوليكار على iPhone</h2><button class="x" data-act="ios-hide" aria-label="إخفاء">✕</button></div>${iosSteps()}<p class="hint">يعمل مثل أي تطبيق، وتصلك الإشعارات على iOS 16.4 أو أحدث.</p></section>`;
+}
+function iosHowSheet(){openSheet(`${sheetHead('ثبّت كوليكار على iPhone')}${iosSteps()}<p class="hint">لا تجد «إضافة إلى الشاشة الرئيسية»؟ مرّر إلى آخر قائمة المشاركة، واضغط «تعديل الإجراءات» وأضفها. الإشعارات تحتاج iOS 16.4 أو أحدث.</p>`)}
 const BELL_TXT={driver:'فعّل الإشعارات لتعرف فور نشر طرد على خطّك، حتى والتطبيق مغلق.',pending:'فعّل الإشعارات لنخبرك فور تفعيل حسابك.',customer:'فعّل الإشعارات لتعرف متى يحجز سائق طردك ومتى يصل، دون أن تفتح التطبيق.',admin:'فعّل التنبيهات على هذا الهاتف: سائق جديد ينتظر التوثيق، دفعة تنتظر التأكيد، طرد جديد.',track:'نبّهني بكل جديد على هذا الطرد، خاصة عند وصوله إلى المحطة.'};
 const bellMem=new WeakMap();
 /* every .bell-slot in the page shows the right prompt for its place: driver, customer, receiver, owner */
@@ -712,7 +805,8 @@ function renderBells(){
     const ctx=el.dataset.ctx,code=el.dataset.code||'',st=Push.state,soft=ctx==='customer'||ctx==='track',hideOn=el.dataset.on==='hide';
     const followed=!code||((Store.me.push||{}).codes||[]).includes(code)||!!(getP(code)||{}).own;
     let h='';
-    if(st==='unsupported'||st==='denied')h=soft||(hideOn&&st==='unsupported')?'':`<div class="bell">${svg('bell')}<div class="bell-body"><p>${esc(pushHelp(st))}</p></div></div>`;
+    const iosInstall=st==='unsupported'&&isIOS()&&!isApp();
+    if(st==='unsupported'||st==='denied')h=(soft&&!iosInstall)||(hideOn&&st==='unsupported')?'':`<div class="bell">${svg('bell')}<div class="bell-body"><p>${esc(pushHelp(st))}</p>${iosInstall?'<button class="btn sm primary" data-act="ios-how">كيف أثبّته؟</button>':''}</div></div>`;
     else if(st==='on'&&followed)h=hideOn?'':`<div class="bell on">${svg('bell')}<div class="bell-body"><p><b>الإشعارات مفعّلة</b> على هذا الهاتف.${ctx==='track'?' سنخبرك بكل جديد على هذا الطرد.':''}</p>${ctx==='track'?'':`<div class="actions"><button class="btn sm" data-act="push-test">جرّب إشعاراً</button><button class="btn sm" data-act="push-off">أوقفها</button></div>`}</div></div>`;
     else if(st==='on'||st==='off')h=`<div class="bell">${svg('bell')}<div class="bell-body"><p>${BELL_TXT[ctx]||BELL_TXT.customer}</p><button class="btn sm primary" data-act="push-on"${code?` data-code="${esc(code)}"`:''}>${ctx==='track'?'نبّهني':'فعّل الإشعارات'}</button></div></div>`;
     if(bellMem.get(el)!==h){bellMem.set(el,h);el.innerHTML=h}
@@ -846,7 +940,7 @@ async function copyText(t){try{await navigator.clipboard.writeText(t);return tru
 const parcels=()=>Object.values(Store.d.parcels||{}).sort((a,b)=>(b.createdAt||0)-(a.createdAt||0));
 const getP=id=>(Store.d.parcels||{})[id];
 const drvStatus=id=>((Store.d.verify||{})[id]||{}).status||'pending';
-const topStatus=t=>((Store.d.approvals||{})[t.id]||{}).status||'pending';
+const topStatus=t=>{const s=((Store.d.approvals||{})[t.id]||{}).status||'pending';return s==='pending'&&t.kind==='card'?(Date.now()-(t.createdAt||0)>864e5?'rejected':'paying'):s};
 const topups=()=>Object.values(Store.d.topups||{}).sort((a,b)=>(b.createdAt||0)-(a.createdAt||0));
 const topupsOf=id=>topups().filter(t=>t.driverId===id);
 const earnedAt=p=>p.pickedAt||p.acceptedAt||p.createdAt;
@@ -875,7 +969,7 @@ function earnings(){const out=[];parcels().forEach(p=>{if(LIVE.includes(p.status
 const isCashIn=t=>topStatus(t)==='approved'&&((!t.byAdmin&&t.amount>0)||t.kind==='cash');
 function ledgerOf(id){
   const L=[];
-  topupsOf(id).forEach(t=>L.push({t:t.createdAt,amt:+t.amount,label:t.bonus?'هدية شحن':/^مكافأة دعوة/.test(t.ref||'')?'مكافأة دعوة':t.kind==='cash'?'شحن نقدي':t.byAdmin?(t.amount>=0?'إضافة من الإدارة':'خصم من الإدارة'):(monthly()?'دفع عبر BaridiMob':'شحن عبر BaridiMob'),sub:String(t.ref||'').replace(/^مكافأة دعوة: /,''),status:topStatus(t)}));
+  topupsOf(id).forEach(t=>L.push({t:t.createdAt,amt:+t.amount,label:t.bonus?'هدية شحن':/^مكافأة دعوة/.test(t.ref||'')?'مكافأة دعوة':t.kind==='cash'?'شحن نقدي':t.kind==='card'?'دفع بالبطاقة':t.byAdmin?(t.amount>=0?'إضافة من الإدارة':'خصم من الإدارة'):(monthly()?'دفع عبر BaridiMob':'شحن عبر BaridiMob'),sub:srvMsg(String(t.ref||'').replace(/^مكافأة دعوة: /,'')),status:topStatus(t)}));
   parcels().forEach(p=>{if(p.driverId===id&&LIVE.includes(p.status))L.push({t:earnedAt(p),amt:-p.commission,label:'عمولة طرد',sub:p.code,status:'approved'});(p.fees||[]).filter(f=>f.driverId===id).forEach(f=>L.push({t:f.t,amt:-f.amount,label:'رسوم إلغاء حجز',sub:p.code,status:'approved'}))});
   return L.sort((a,b)=>b.t-a.t);
 }
@@ -929,7 +1023,7 @@ function setRole(r){roleMem=r;try{if(r)localStorage.setItem(ROLE_KEY,JSON.string
 const roleHome=r=>r==='customer'?'send':r==='driver'?'driver':'home';
 function normRoute(r){if(!ROUTES[r])r='home';if(appOf(r)==='driver'&&r!=='driver'&&!driverVerified())r='driver';return r}
 function go(r,o={}){
-  const nr=normRoute(r);if(nr!==S.route&&!$('#sheet-wrap').hidden)closeSheet();
+  const nr=normRoute(r);S.want=!Store.ready&&nr!==r&&ROUTES[r]?r:null;if(nr!==S.route&&!$('#sheet-wrap').hidden)closeSheet();
   S.route=nr;
   renderShell();renderView(!o.keepScroll);
   if(!o.fromHash){const h='#'+S.route;if(location.hash!==h){try{history.replaceState(null,'',h)}catch(e){}}}
@@ -997,7 +1091,8 @@ const VIEWS={};
 
 /* ----- HOME ----- */
 VIEWS.home={html(){return `
-  <section class="hero-card"><svg class="hero-logo" viewBox="0 0 120 120" aria-hidden="true">${LOGO}</svg><div><h1>أرسل كوليك مع الكار</h1><p>من ولاية لولاية، مع سائقي حافلات موثّقين، وبرموز أمان للاستلام والتسليم.</p></div></section>
+  <section class="hero-card"><svg class="hero-logo" viewBox="0 0 120 120" aria-hidden="true">${LOGO_W}</svg><div><h1>أرسل كوليك مع الكار</h1><p>من ولاية لولاية، مع سائقي حافلات موثّقين، وبرموز أمان للاستلام والتسليم.</p></div></section>
+  ${iosCard()}
   <section><h2>كيف ستستعمل التطبيق؟</h2>
   <div class="roles">
     <button class="role-tile" data-act="pick-role" data-role="customer"><span class="rt-icon">${svg('box')}</span><span class="rt-title">أنا زبون</span><span class="rt-desc">أرسل طرداً إلى ولاية أخرى، وتابعه حتى يصل.</span><span class="rt-go">${svg('arrowL')}</span></button>
@@ -1009,7 +1104,7 @@ VIEWS.home={html(){return `
   <section class="card"><h2>كيف يعمل؟</h2><ol class="how"><li><span><b>المرسل</b> يملأ وصل الإرسال ويحصل على رمزين.</span></li><li><span><b>سائق موثّق</b> على نفس الخط يحجز الطرد ويستلمه برمز الاستلام.</span></li><li><span><b>المستلم</b> يتفقد طرده، ثم يعطي السائق رمز التسليم.</span></li></ol></section>
   ${adminAllowed()?`<button class="admin-entry" data-act="go" data-r="admin">${svg('shield')}<span><b>لوحة التحكم</b><small>تظهر لك وحدك، كصاحب التطبيق</small></span></button>`:''}
   <div class="size-row"><span>حجم الخط</span><div class="chips" role="radiogroup" aria-label="حجم الخط"><input class="chip-in" type="radio" name="fsz" id="fsz-n" value="n"${isBig()?'':' checked'}><label class="chip" for="fsz-n">عادي</label><input class="chip-in" type="radio" name="fsz" id="fsz-b" value="b"${isBig()?' checked':''}><label class="chip" for="fsz-b">كبير</label></div></div>
-  <div class="foot-links">${isApp()?'':`<a href="download.html" target="_blank" rel="noopener">تطبيق أندرويد</a>`}<a href="terms.html" target="_blank" rel="noopener">شروط الاستعمال</a><a href="privacy.html" target="_blank" rel="noopener">سياسة الخصوصية</a>${adminAllowed()?'':`<button class="owner-link" data-act="go" data-r="admin">دخول صاحب التطبيق</button>`}</div>`}};
+  <div class="foot-links">${isApp()?'':isIOS()?`<a href="download.html#iphone" target="_blank" rel="noopener">ثبّت على iPhone</a>`:`<a href="download.html" target="_blank" rel="noopener">تطبيق أندرويد</a>`}<a href="terms.html" target="_blank" rel="noopener">شروط الاستعمال</a><a href="privacy.html" target="_blank" rel="noopener">سياسة الخصوصية</a><button class="owner-link" data-act="lang" data-to="fr" lang="fr">Français</button></div>`}};
 
 /* ----- CUSTOMER ----- */
 VIEWS.send={
@@ -1162,7 +1257,7 @@ async function fetchTrack(code){
 function goTrack(code){
   code=String(code||'').toUpperCase().replace(/[^A-Z0-9]/g,'');S.trackCode=code;
   if(code&&TRK[code]&&TRK[code].err)delete TRK[code];
-  if(S.route!=='track')go('track');else{const i=$('#t-code');if(i)i.value=code;VIEWS.track.live()}
+  if(S.route!=='track')go('track');else{const i=$('#t-code');if(i){i.value=code;VIEWS.track.live()}}
 }
 
 /* ----- DRIVER ----- */
@@ -1249,13 +1344,28 @@ VIEWS.wallet={
     <section class="head"><h1>${monthly()?'مستحقاتي':'رصيدي'}</h1><p class="lead">${monthly()?`أجرة التوصيل تقبضها أنت نقداً. عمولة المنصة (${st.commission}%) تُجمع طوال الشهر، وتسدّدها مرة واحدة قبل ${dueTxt()}. إذا تأخرت يتوقف حسابك حتى تسدّد.`:`أجرة التوصيل تقبضها أنت نقداً. تُخصم عمولة المنصة (${st.commission}%) من هذا الرصيد عند استلام كل طرد، ولا تحجز إلا إذا كان رصيدك يكفي.`}</p></section>
     <div id="drv-stats" class="stats"></div>
     ${st.bonusPct>0?`<div class="offer">${svg('gift')}<span>اشحن <b>${DA(st.bonusMin)}</b> أو أكثر، ونضيف لك <b>${st.bonusPct}%</b> هدية إلى رصيدك.</span></div>`:''}
-    <form id="topup-form" class="card form" novalidate>
-      <h2>${monthly()?'سدّد عبر BaridiMob':'اشحن عبر BaridiMob'}</h2>
-      <p class="hint">حوّل المبلغ إلى ${st.rip?`<b dir="ltr">${esc(st.rip)}</b>`:'حساب المنصة (لم يحدّده صاحب التطبيق بعد)'}، ثم أدخل رقم العملية. يُضاف المبلغ بعد التأكد من التحويل.</p>
+    <form id="topup-form" class="card form" novalidate data-pm="${st.card?'card':'bm'}">
+      <h2>${monthly()?'سدّد عمولتك':'اشحن رصيدك'}</h2>
       <fieldset class="field"><legend>المبلغ</legend><div class="chips">${(monthly()?[...new Set([Math.ceil((duesOf((myDriver()||{}).id).debt||0)/100)*100,1000,2000,5000].filter(a=>a>0))]:[500,1000,2000,5000]).map((a,i)=>`<input class="chip-in" type="radio" name="amt" id="amt-${a}" value="${a}"${i===(monthly()?0:1)?' checked':''}><label class="chip" for="amt-${a}">${DA(a)}${st.bonusPct>0&&a>=st.bonusMin?`<small>+${DA(Math.round(a*st.bonusPct/100))} هدية</small>`:''}</label>`).join('')}</div></fieldset>
-      <label class="field"><span>رقم عملية التحويل</span><input id="tp-ref" dir="ltr" placeholder="مثال: 7781-4402"></label>
-      <p class="form-err" id="tp-err" role="alert"></p>
-      <button class="btn primary block" type="submit">${monthly()?'أرسل إثبات الدفع':'أرسل طلب الشحن'}</button>
+      ${st.card?`<fieldset class="field"><legend>طريقة الدفع</legend><div class="chips pm">
+        <input class="chip-in" type="radio" name="pm" id="pm-card" value="card" checked><label class="chip" for="pm-card">${GOLD}<span>البطاقة الذهبية أو CIB<small>يُضاف المبلغ فوراً</small></span></label>
+        <input class="chip-in" type="radio" name="pm" id="pm-bm" value="bm"><label class="chip" for="pm-bm">${svg('phone')}<span>تحويل BaridiMob<small>يُضاف بعد تأكد الإدارة</small></span></label>
+      </div></fieldset>
+      <div class="pm-box" data-for="card">
+        ${st.card==='test'?`<p class="warnbox">وضع التجربة: لا تُسحب أموال حقيقية، والبطاقات الحقيقية لا تعمل.</p>`:''}
+        <p class="hint">ننقلك إلى صفحة الدفع الآمنة (Chargily Pay). تكتب معلومات بطاقتك هناك، ثم ترجع إلى كوليكار. رقم بطاقتك لا يمر بتطبيقنا.</p>
+        <button class="btn primary block" type="button" data-act="pay-card">${GOLD}<span>ادفع بالبطاقة</span></button>
+      </div>`:''}
+      <div class="pm-box" data-for="bm">
+        <ol class="how">
+          <li><span>افتح تطبيق <b>BaridiMob</b> ببطاقتك الذهبية، واختر «تحويل».</span></li>
+          <li><span>حوّل المبلغ إلى ${st.rip?`هذا الحساب: <span class="rip"><b dir="ltr" id="rip-val">${esc(st.rip)}</b><button class="btn sm" type="button" data-act="copy-rip">انسخ</button></span>`:'حساب المنصة (لم يحدّده صاحب التطبيق بعد).'}</span></li>
+          <li><span>اكتب هنا رقم العملية الذي يظهر بعد التحويل. يُضاف المبلغ بعد التأكد من وصوله.</span></li>
+        </ol>
+        <label class="field"><span>رقم عملية التحويل</span><input id="tp-ref" dir="ltr" placeholder="مثال: 7781-4402"></label>
+        <p class="form-err" id="tp-err" role="alert"></p>
+        <button class="btn primary block" type="submit">${monthly()?'أرسل إثبات الدفع':'أرسل طلب الشحن'}</button>
+      </div>
     </form>
     ${st.contactPhone?`<div class="card"><h2>تفضّل الدفع نقداً؟</h2><p class="hint">ادفع لصاحب التطبيق مباشرة، ويسجّل المبلغ في حسابك.</p><div class="actions"><a class="btn wa" href="${esc(waLink(st.contactPhone,'السلام عليكم، أريد شحن رصيدي في كوليكار نقداً.'))}" target="_blank" rel="noopener">راسله عبر واتساب</a><span class="hint" style="align-self:center">${tel(st.contactPhone)}</span></div></div>`:''}
     ${inviteHtml(myDriver())}
@@ -1269,6 +1379,7 @@ VIEWS.wallet={
       <div class="stat"><span class="k">ربحك من التسليمات</span><span class="v">${DA(sum(done,p=>p.price-p.commission))}</span><span class="s">التسليمات: ${done.length}</span></div>
       <div class="stat"><span class="k">${monthly()?'عمولات هذا الشهر':'عمولات خُصمت'}</span><span class="v">${DA(X?X.month:commissionsOf(d.id)+fees)}</span><span class="s">${X?'تُسدَّد قبل '+dueTxt():fees?`منها رسوم إلغاء: ${DA(fees)}`:'منذ التسجيل'}</span></div>
       <div class="stat"><span class="k">التقييم</span><span class="v">${r?r.avg.toFixed(1)+' / 5':'—'}</span><span class="s">${r?`عدد التقييمات: ${r.n}`:'لا تقييمات بعد'}</span></div>`;
+    topupsOf(d.id).filter(t=>t.kind==='card'&&topStatus(t)==='paying'&&Date.now()-(t.createdAt||0)>6e4).slice(0,2).forEach(t=>payReturn(t.id,true));
     const L=ledgerOf(d.id).slice(0,15);
     $('#drv-ledger').innerHTML=L.length?`<div class="rows">${L.map(x=>`<div class="row static"><span class="r1">${x.label}</span><span class="r3 n${x.amt>0?' plus':''}">${x.amt>0?'+':'−'}${DA(Math.abs(x.amt))}</span><span class="r2"><span dir="auto">${esc(x.sub||'')}</span> · ${ago(x.t)}</span><span class="r3">${x.status!=='approved'?tpill(x.status):''}</span></div>`).join('')}</div>`:`<div class="empty">لا حركات بعد.</div>`;
     renderBells();
@@ -1305,6 +1416,25 @@ async function submitLogin(){
   if(!r.ok){err.textContent=r.net?'تعذر الاتصال. تحقق من الإنترنت ثم أعد المحاولة.':r.error||'';return}
   if(!r.result.ok){err.textContent=r.result.error;return}
   Store.me.driverId=r.result.driverId;saveMe();closeSheet();go('driver');toast('دخلت إلى حسابك على هذا الهاتف.','ok');
+}
+/* card payment: the server opens a checkout at the gateway, the driver pays there and comes back with ?pay=ID */
+async function payCard(){
+  const d=myDriver();if(!d)return;const amount=+((document.querySelector('input[name="amt"]:checked')||{}).value||0);
+  const r=await call('payStart',{amount,back:location.origin+location.pathname,lang:LANG});
+  if(!r.ok||!r.result||!r.result.url)return;
+  lsSet('kolicar.pay',{id:r.result.id,t:Date.now()});
+  toast('ننقلك إلى صفحة الدفع…');
+  location.href=r.result.url;
+}
+const payAsked={};
+async function payReturn(id,quiet){
+  if(!id||payAsked[id])return;payAsked[id]=1;
+  const r=await call('payCheck',{id},{quiet:true,silent:quiet});
+  if(!r.ok){delete payAsked[id];if(!quiet)toast(r.net?'تعذر الاتصال. تحقق من الإنترنت ثم أعد المحاولة.':r.error||'تعذر التحقق من الدفع.','bad');return}
+  const x=r.result||{};
+  if(x.status==='approved'){lsDel('kolicar.pay');toast(`تم الدفع بالبطاقة. أُضيف ${DA(x.amount)} إلى حسابك${x.bonus?`، ومعه هدية ${DA(x.bonus)}`:''}.`,'ok')}
+  else if(x.status==='rejected'){lsDel('kolicar.pay');if(!quiet)toast('لم يكتمل الدفع بالبطاقة، ولم يُسحب منك شيء. يمكنك المحاولة من جديد.','bad')}
+  else{delete payAsked[id];if(!quiet)toast('لم يصلنا تأكيد الدفع بعد. إذا دفعت، يُضاف المبلغ خلال دقائق.')}
 }
 async function submitTopup(){
   const d=myDriver();if(!d)return;const ref=$('#tp-ref').value.trim(),amount=+((document.querySelector('input[name="amt"]:checked')||{}).value||0),err=$('#tp-err');
@@ -1460,7 +1590,7 @@ VIEWS['admin-wallet']={
       <div class="stat"><span class="k">طلبات معلّقة</span><span class="v">${DA(sum(pend,t=>t.amount))}</span><span class="s">العدد: ${pend.length}</span></div>`;
     const list=tps.filter(t=>S.awf==='all'||topStatus(t)===S.awf);
     $('#aw-list').innerHTML=list.length?list.slice(0,100).map(t=>{const d=(Store.d.drivers||{})[t.driverId],s=topStatus(t);
-      return `<div class="row static"><span class="r1"><span class="n">${t.amount>=0?'':'−'}${DA(Math.abs(t.amount))}</span> · ${esc(d?d.name:'سائق')}${ex(t)}</span><span class="r3">${tpill(s)}</span><span class="r2">${t.bonus?`هدية: ${esc(t.ref)}`:t.byAdmin?`${t.kind==='cash'?'شحن نقدي':'تعديل منك'}: ${esc(t.ref)}`:`رقم العملية <span dir="ltr">${esc(t.ref)}</span>`} · ${ago(t.createdAt)}</span><span class="r3">${s==='pending'?`<span class="actions" style="gap:6px;flex-wrap:nowrap"><button class="btn sm primary" data-act="approve" data-id="${esc(t.id)}" data-v="approved">وصل</button><button class="btn sm danger" data-act="approve" data-id="${esc(t.id)}" data-v="rejected">لم يصل</button></span>`:''}</span></div>`}).join('')
+      return `<div class="row static"><span class="r1"><span class="n">${t.amount>=0?'':'−'}${DA(Math.abs(t.amount))}</span> · ${esc(d?d.name:'سائق')}${ex(t)}</span><span class="r3">${tpill(s)}</span><span class="r2">${t.bonus?`هدية: ${esc(srvMsg(t.ref))}`:t.byAdmin?`${t.kind==='cash'?'شحن نقدي':'تعديل منك'}: ${esc(srvMsg(t.ref))}`:`${t.kind==='card'?'دفع بالبطاقة':'رقم العملية'} <span dir="ltr">${esc(t.ref)}</span>`} · ${ago(t.createdAt)}</span><span class="r3">${s==='pending'?`<span class="actions" style="gap:6px;flex-wrap:nowrap"><button class="btn sm primary" data-act="approve" data-id="${esc(t.id)}" data-v="approved">وصل</button><button class="btn sm danger" data-act="approve" data-id="${esc(t.id)}" data-v="rejected">لم يصل</button></span>`:''}</span></div>`}).join('')
       :`<div class="empty" style="box-shadow:none">${S.awf==='pending'?'لا طلبات شحن تنتظرك.':'لا عمليات في هذا التصنيف.'}</div>`;
   }
 };
@@ -1498,6 +1628,7 @@ VIEWS['admin-config']={
       <div class="two"><label class="field"><span>هدية الدفع المسبق (%)</span><input id="s-bonus" inputmode="numeric" value="${st.bonusPct}"></label><label class="field"><span>لمن يشحن على الأقل (دج)</span><input id="s-bmin" inputmode="numeric" value="${st.bonusMin}"></label></div>
       <label class="field"><span>مكافأة دعوة سائق (دج لكل سائق جديد تُوثّقه، 0 = بلا مكافأة)</span><input id="s-ref" inputmode="numeric" value="${st.refBonus}"></label>
       <label class="field"><span>حساب BaridiMob أو RIP لاستقبال الشحن</span><input id="s-rip" dir="ltr" value="${esc(st.rip)}" placeholder="00799999 ..."></label>
+      <p class="hint">الدفع بالبطاقة الذهبية أو CIB: <b>${st.card==='live'?'مفعّل':st.card==='test'?'مفعّل في وضع التجربة':'غير مفعّل'}</b>. ${st.card?'السائق يدفع ببطاقته ويُضاف رصيده تلقائياً.':'يشتغل بعد أن تفتح حساب تاجر في Chargily Pay وتضع مفتاحه السري في خصائص السكربت باسم CHARGILY_KEY.'}</p>
       <label class="field"><span>هاتفك للشحن النقدي</span><input id="s-phone" inputmode="tel" dir="ltr" value="${esc(st.contactPhone)}" placeholder="0555 12 34 56"></label>
       <p class="form-err" id="col-err" role="alert"></p>
       <button class="btn primary block" type="submit">احفظ إعدادات التحصيل</button>
@@ -1651,6 +1782,11 @@ const ACT={
   'push-on':d=>enablePush({code:d.code||''}),
   'push-off':()=>confirmSheet('إيقاف الإشعارات','لن تصلك تنبيهات كوليكار على هذا الهاتف. يمكنك تفعيلها من جديد في أي وقت.','أوقفها',async()=>{closeSheet();await disablePush()}),
   'push-test':()=>testPush(),
+  'pay-card':()=>payCard(),
+  'copy-rip':async()=>{const v=($('#rip-val')||{}).textContent||'';try{await navigator.clipboard.writeText(v.replace(/\s+/g,''));toast('نُسخ رقم الحساب.','ok')}catch(e){toast('انسخه يدوياً: '+v)}},
+  lang:d=>{const to=d.to==='fr'?'fr':'ar';try{localStorage.setItem('kolicar.lang',to)}catch(e){}location.replace((to==='fr'?'fr.html':'./')+location.search+location.hash)},
+  'ios-hide':()=>{lsSet('kolicar.iosHint',Date.now());const c=$('.ios-card');if(c)c.remove()},
+  'ios-how':()=>iosHowSheet(),
   'promo-apply':()=>applyPromo(false),
   'deps-edit':()=>depsSheet(),
   'dep-add':()=>{S.depRows=readDepRows();if(S.depRows.length>=6){toast('ستة مواعيد على الأكثر.');return}const last=S.depRows[S.depRows.length-1];S.depRows.push(last?{back:!last.back,days:last.days.slice(),t:last.t}:{back:false,days:[0,1,2,3,4],t:'07:00'});renderDepRows()},
@@ -1673,6 +1809,7 @@ document.addEventListener('submit',e=>{e.preventDefault();const f=e.target,id=f.
   const b=f.querySelector('[type="submit"]');if(res&&b){b.disabled=true;res.finally(()=>{b.disabled=false})}});
 document.addEventListener('change',async e=>{
   const t=e.target;
+  if(t.name==='pm'){const f=$('#topup-form');if(f)f.dataset.pm=t.value}
   if(t.closest&&t.closest('#send-form'))updateQuote();
   if(t.name==='apf'){S.apf=t.value;VIEWS['admin-parcels'].live()}
   if(t.name==='adf'){S.adf=t.value;VIEWS['admin-drivers'].live()}
@@ -1717,7 +1854,8 @@ function start(){
   /* links from outside: ?t=CODE opens tracking (sent to receivers), ?admin opens the control room,
      ?ref=CODE fills a driver's invite code, ?promo=CODE fills a discount code */
   let q=null;try{q=new URLSearchParams(location.search)}catch(e){}
-  if(q&&q.get('t'))goTrack(q.get('t'));else if(q&&q.has('admin'))go('admin');
+  if(q&&q.get('pay')){const pid=String(q.get('pay')).replace(/[^A-Za-z0-9-]/g,'').slice(0,12);try{history.replaceState(null,'',location.pathname+'#wallet')}catch(e){}if(Store.me.driverId){setRole('driver');go('wallet');payReturn(pid)}}
+  else if(q&&q.get('t'))goTrack(q.get('t'));else if(q&&q.has('admin'))go('admin');
   else if(hasServer()){try{google.script.url.getLocation(loc=>{const p=(loc&&loc.parameter)||{};if(p.t)goTrack(p.t);else if('admin' in p)go('admin')})}catch(e){}}
   const clean=(v,n)=>String(v||'').toUpperCase().replace(/[^A-Z0-9]/g,'').slice(0,n);
   if(q&&q.get('ref')&&clean(q.get('ref'),10)){lsSet('kolicar.ref',clean(q.get('ref'),10));if(!Store.me.driverId){setRole('driver');go('driver')}}
@@ -1726,6 +1864,8 @@ function start(){
   if('serviceWorker' in navigator){try{navigator.serviceWorker.addEventListener('message',e=>{const m=e.data||{};if(m.kc!=='open'||!m.url)return;try{const u=new URL(m.url);const t=u.searchParams.get('t'),h=u.hash.slice(1);if(t)goTrack(t);else if(ROUTES[h])go(h)}catch(x){}poll()})}catch(e){}}
   /* the app shell is kept on the phone so it opens even without internet */
   if('serviceWorker' in navigator&&!hasServer()&&(location.protocol==='https:'||/^(127\.0\.0\.1|localhost)$/.test(location.hostname))){try{navigator.serviceWorker.register('sw.js').catch(()=>{})}catch(e){}}
+  /* the notification worker shows text in this page's language */
+  try{if(window.caches)caches.open('kolicar-meta').then(c=>c.put(new URL('__kolicar_lang',location.href).href,new Response(LANG))).catch(()=>{})}catch(e){}
   firstLoad();
 }
 start();

@@ -2,12 +2,13 @@
 <html lang="ar" dir="rtl">
 <head>
 <meta charset="utf-8">
+<script>(function(){var PAGE='ar',TWIN='privacy.fr.html';try{var l=localStorage.getItem('kolicar.lang');if(l!=='ar'&&l!=='fr'){l='ar';var a=navigator.languages&&navigator.languages.length?navigator.languages:[navigator.language||''];for(var i=0;i<a.length;i++){var c=String(a[i]).slice(0,2).toLowerCase();if(c==='ar'||c==='fr'){l=c;break}}}if(l!==PAGE)location.replace(TWIN+location.search+location.hash)}catch(e){}})();</script>
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<meta name="theme-color" content="#EEF2F7">
+<meta name="theme-color" content="#F2F5FA">
 <title>سياسة الخصوصية — كوليكار</title>
 <link rel="icon" href="icon-192.png">
 <style>
-:root{--bg:#EEF2F7;--surface:#fff;--ink:#0F1A26;--ink-2:#26323F;--muted:#4D5A68;--line:#D3DBE5;--primary:#2B5FCC;color-scheme:light}
+:root{--bg:#F2F5FA;--surface:#fff;--ink:#0B1730;--ink-2:#22304A;--muted:#566377;--line:#D5DDE9;--primary:#1F56D8;color-scheme:light}
 @media (prefers-color-scheme:dark){:root{--bg:#0D1420;--surface:#152031;--ink:#EEF3F9;--ink-2:#D4DEE9;--muted:#A9B6C4;--line:#2B3B52;--primary:#7AA7FF;color-scheme:dark}}
 *{box-sizing:border-box}
 body{margin:0;background:var(--bg);color:var(--ink);font:17px/1.8 "Readex Pro","Segoe UI",Tahoma,Arial,sans-serif}
@@ -20,7 +21,7 @@ p,li{color:var(--ink-2)}
 ul{padding-inline-start:22px;margin:6px 0}
 section{background:var(--surface);border-radius:18px;padding:6px 20px 16px;margin-top:16px;box-shadow:0 1px 2px rgba(15,26,38,.06),0 4px 14px rgba(15,26,38,.06)}
 .meta{color:var(--muted);font-size:.92rem}
-.fr{direction:ltr;text-align:left}
+.foot{display:flex;gap:18px;flex-wrap:wrap;margin-top:18px}
 a{color:var(--primary)}
 b{font-weight:600}
 [data-k=phone],[data-k=email]{white-space:nowrap;unicode-bidi:isolate}
@@ -39,7 +40,7 @@ b{font-weight:600}
 <ul>
 <li><b>عند إرسال طرد:</b> اسم المرسل وهاتفه، اسم المستلم وهاتفه، ولايتا الانطلاق والوصول، وصف الطرد وحجمه وقيمته التقريبية إن ذكرتها.</li>
 <li><b>من السائقين:</b> الاسم، الهاتف، رقم تسجيل الحافلة، اسم الناقل، الخط، صورة بطاقة التعريف أو رخصة السياقة، وصور الطرود عند استلامها إن التقطها السائق.</li>
-<li><b>المدفوعات:</b> مبالغ العمولات وأرقام عمليات التحويل التي يدخلها السائق.</li>
+<li><b>المدفوعات:</b> مبالغ العمولات وأرقام عمليات التحويل التي يدخلها السائق. إذا دفع السائق بالبطاقة الذهبية أو بطاقة CIB، يكتب معلومات بطاقته في صفحة خدمة الدفع Chargily Pay وحدها: رقم البطاقة لا يصلنا ولا نحفظه، ونحفظ فقط مرجع العملية ومبلغها وحالتها.</li>
 <li><b>التقييمات:</b> تقييم المستلم للسائق بعد التسليم.</li>
 <li><b>الإشعارات (اختيارية):</b> إذا فعّلتها، نحفظ عنوان الاشتراك الذي يعطيه متصفحك لخدمة الإشعارات التابعة له (مثل Google أو Mozilla أو Apple)، لنرسل إليك تنبيهات عن طرودك، أو عن الطرود على خطّك إن كنت سائقاً. ما يمر عبر تلك الخدمة «جرس» فارغ فقط: يجلب هاتفك نص الإشعار من خادمنا مباشرة، فلا يمر أي اسم أو هاتف عبرها. يمكنك إيقافها في أي وقت من التطبيق أو من إعدادات الهاتف.</li>
 <li><b>مواعيد الرحلات:</b> الأيام والساعات التي يضيفها السائق تظهر للزبائن دون اسمه أو هاتفه، ويرى كل مرسل موعد سائقه بعد أن يحجز طرده.</li>
@@ -81,22 +82,12 @@ b{font-weight:600}
 <p>إذا غيّرنا هذه السياسة ننشر النسخة الجديدة في هذه الصفحة مع تاريخ التحديث.</p>
 </section>
 
-<section class="fr" lang="fr">
-<h2>Politique de confidentialité (résumé en français)</h2>
-<p><b>Kolicar</b> met en relation des expéditeurs de colis avec des chauffeurs de bus interwilayas. Responsable du traitement : <b data-k="owner">le propriétaire de l'application</b>, <span data-k="city"></span> — <span data-k="email"></span> · <span data-k="phone"></span>.</p>
-<ul>
-<li><b>Données collectées :</b> nom et téléphone de l'expéditeur et du destinataire, trajet, description du colis ; pour les chauffeurs : nom, téléphone, immatriculation du bus, transporteur, ligne, photo de la pièce d'identité ou du permis, photos des colis, références de paiement ; notes ; un identifiant aléatoire créé par l'application et stocké sur le téléphone ; si vous activez les notifications (facultatives), l'adresse d'abonnement fournie par votre navigateur — le service de notification ne transporte qu'un signal vide, le texte est récupéré directement sur notre serveur ; codes promo utilisés et parrainages des chauffeurs ; horaires de départ publiés sans nom ni téléphone. Aucune localisation, aucun contact, aucune publicité.</li>
-<li><b>Finalités :</b> attribuer les colis aux chauffeurs, sécuriser la remise par codes, vérifier les chauffeurs, calculer et suivre les commissions.</li>
-<li><b>Accès :</b> le chauffeur ne voit les coordonnées qu'après avoir réservé le colis ; le code de suivi montre l'état du colis et le téléphone du chauffeur pendant le trajet ; le propriétaire voit tout. Aucune vente ni cession à des tiers, sauf obligation légale.</li>
-<li><b>Stockage :</b> compte Google du propriétaire (Google Sheets et Google Drive), serveurs de Google pouvant se trouver hors d'Algérie. Codes de sécurité stockés sous forme chiffrée (hachage). Sauvegarde quotidienne dans le même Google Drive, 14 dernières copies conservées. Conservation : 2 ans maximum après la dernière activité ; pièces d'identité supprimées à la fermeture du compte chauffeur ou après 1 an d'inactivité.</li>
-<li><b>Vos droits (loi 18-07) :</b> accès, rectification, suppression, opposition, par e-mail ou téléphone ; réponse sous 15 jours ; réclamation possible auprès de l'ANPDP.</li>
-<li>Service réservé aux personnes de 18 ans et plus.</li>
-</ul>
-</section>
+<p class="foot"><a href="./">العودة إلى كوليكار</a><a class="lang" href="privacy.fr.html" lang="fr" onclick="try{localStorage.setItem('kolicar.lang','fr')}catch(e){}">Français</a></p>
 </main>
 <script>
 (function(){var c=window.KOLICAR||{};var ok=function(v){return v&&!/^(اسمك|بريدك|رقم هاتفك)/.test(v)};
-document.querySelectorAll('[data-k]').forEach(function(el){var v=c[el.getAttribute('data-k')];if(ok(v))el.textContent=v;else if(el.getAttribute('data-k')!=='owner')el.textContent='—'})})();
+var TR=/*@TR@*/{};
+document.querySelectorAll('[data-k]').forEach(function(el){var v=c[el.getAttribute('data-k')];if(ok(v))el.textContent=TR[v]||v;else if(el.getAttribute('data-k')!=='owner')el.textContent='—'})})();
 </script>
 </body>
 </html>

@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+<html lang="fr" dir="ltr">
+<head>
+<meta charset="utf-8">
+<script>(function(){var PAGE='fr',TWIN='download.html';try{var l=localStorage.getItem('kolicar.lang');if(l!=='ar'&&l!=='fr'){l='ar';var a=navigator.languages&&navigator.languages.length?navigator.languages:[navigator.language||''];for(var i=0;i<a.length;i++){var c=String(a[i]).slice(0,2).toLowerCase();if(c==='ar'||c==='fr'){l=c;break}}}if(l!==PAGE)location.replace(TWIN+location.search+location.hash)}catch(e){}})();</script>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="theme-color" content="#F2F5FA">
+<title>Télécharger l’application Kolicar : Android et iPhone</title>
+<meta name="description" content="Installez l’application Kolicar sur Android ou iPhone : envoyez vos colis d’une wilaya à l’autre avec des chauffeurs de bus vérifiés.">
+<link rel="icon" href="icon-192.png">
+<link rel="apple-touch-icon" sizes="180x180" href="apple-touch-icon.png">
+<meta name="apple-mobile-web-app-title" content="Kolicar">
+<meta name="format-detection" content="telephone=no">
+<link rel="manifest" href="manifest.webmanifest">
+<style>
+:root{--bg:#F2F5FA;--surface:#fff;--surface-2:#EEF2F8;--ink:#0B1730;--ink-2:#22304A;--muted:#566377;--line:#D5DDE9;--primary:#1F56D8;--primary-ink:#fff;--primary-soft:#E6EEFD;--amber-soft:#FDF1DC;--ok:#11734A;color-scheme:light}
+@media (prefers-color-scheme:dark){:root{--bg:#0D1420;--surface:#152031;--surface-2:#1C2A3D;--ink:#EEF3F9;--ink-2:#D4DEE9;--muted:#A9B6C4;--line:#2B3B52;--primary:#7AA7FF;--primary-ink:#081733;--primary-soft:rgba(122,167,255,.16);--amber-soft:rgba(240,182,90,.14);--ok:#5CCB91;color-scheme:dark}}
+*{box-sizing:border-box}
+[hidden]{display:none!important}
+body{margin:0;background:var(--bg);color:var(--ink);font:17px/1.75 "Readex Pro","Segoe UI",Tahoma,Arial,sans-serif}
+main{max-width:640px;margin:0 auto;padding:24px 18px 48px;display:flex;flex-direction:column;gap:16px}
+.hero{display:flex;align-items:center;gap:16px;padding:20px;border-radius:24px;background:linear-gradient(160deg,var(--primary-soft),var(--surface) 75%);box-shadow:0 1px 2px rgba(15,26,38,.06),0 4px 14px rgba(15,26,38,.06)}
+.hero img{width:84px;height:84px;border-radius:20px;flex:none}
+h1{font-size:1.5rem;margin:0;line-height:1.3}
+h2{font-size:1.15rem;margin:0}
+p{margin:0;color:var(--ink-2)}
+.card{background:var(--surface);border-radius:20px;padding:20px;display:flex;flex-direction:column;gap:14px;box-shadow:0 1px 2px rgba(15,26,38,.06),0 4px 14px rgba(15,26,38,.06)}
+.btn{font:inherit;font-weight:600;font-size:1.1rem;border-radius:16px;padding:14px 20px;border:0;background:var(--primary);color:var(--primary-ink);cursor:pointer;display:flex;align-items:center;justify-content:center;gap:10px;text-decoration:none;min-height:56px;width:100%}
+.btn.ghost{background:var(--surface-2);color:var(--ink);font-weight:500}
+.btn svg{width:24px;height:24px;fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
+ol{margin:0;padding-inline-start:24px;display:flex;flex-direction:column;gap:8px}
+li{color:var(--ink-2)}
+.hint{font-size:.92rem;color:var(--muted)}
+.note{background:var(--amber-soft);border-radius:14px;padding:12px 14px;font-size:.95rem}
+.ok{color:var(--ok);font-weight:600}
+a{color:var(--primary)}
+.foot{display:flex;justify-content:center;gap:18px;flex-wrap:wrap;font-size:.92rem}
+.foot a{color:var(--muted)}
+.hero{background:linear-gradient(150deg,#1A3F9C,#0C1F4A 78%);box-shadow:0 12px 28px rgba(12,31,74,.3)}
+.hero h1{color:#fff}
+.hero p{color:#D3DEF6}
+.hero img{border-radius:22px}
+.share-ic{display:inline-block;width:20px;height:20px;vertical-align:-4px;fill:none;stroke:var(--primary);stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
+</style>
+</head>
+<body>
+<main>
+<div class="hero"><img src="icon-192.png" alt=""><div><h1 id="h1">Application Kolicar</h1><p><span id="for-both">Pour Android et iPhone. </span>Envoyez votre colis par bus d’une wilaya à l’autre, suivez-le étape par étape et recevez les notifications sur votre téléphone.</p></div></div>
+
+<section class="card" id="in-app" hidden>
+  <h2 class="ok">Vous utilisez déjà l’application Kolicar</h2>
+  <p>Rien à télécharger. <a href="fr.html">Retour à l’application</a>.</p>
+</section>
+
+<section class="card" id="apk-card">
+  <h2>Télécharger l’application</h2>
+  <a class="btn" id="apk-btn" href="kolicar.apk" download="kolicar.apk"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 4v11M7 10l5 5 5-5M5 20h14"/></svg><span>Télécharger Kolicar (APK)</span></a>
+  <p class="hint" id="apk-size">Petit fichier pour téléphones Android.</p>
+  <ol>
+    <li>Appuyez sur « Télécharger » et attendez la fin.</li>
+    <li>Ouvrez le fichier depuis les notifications ou depuis « Téléchargements ».</li>
+    <li>Si le téléphone demande d’autoriser l’installation d’applications depuis cette source, appuyez sur « Paramètres », activez « Autoriser », puis revenez.</li>
+    <li>Appuyez sur « Installer », puis sur « Ouvrir ».</li>
+  </ol>
+  <p class="note">L’application n’est pas encore sur Google Play ; le téléphone peut donc la signaler comme « application inconnue ». C’est normal pour une application téléchargée directement depuis son site. Téléchargez-la uniquement depuis cette page.</p>
+</section>
+
+<section class="card" id="apk-soon" hidden>
+  <h2>Le fichier de l’application est en préparation</h2>
+  <p>Le fichier APK sera bientôt disponible ici. Vous pouvez dès maintenant installer Kolicar depuis le navigateur comme indiqué ci-dessous : il fonctionne exactement comme l’application.</p>
+</section>
+
+<section class="card" id="pwa-card">
+  <h2>Ou installez-le depuis le navigateur</h2>
+  <button class="btn ghost" id="pwa-btn" hidden>Installer Kolicar sur ce téléphone</button>
+  <ol id="pwa-steps">
+    <li>Ouvrez <a href="fr.html">Kolicar</a> dans le navigateur Chrome.</li>
+    <li>Appuyez sur le bouton de menu ⋮ en haut de l’écran.</li>
+    <li>Choisissez « Installer l’application » ou « Ajouter à l’écran d’accueil ».</li>
+  </ol>
+</section>
+
+<section class="card" id="iphone">
+  <h2>Sur iPhone</h2>
+  <p>Sur iPhone, il n’y a pas de fichier à télécharger : Kolicar s’installe depuis Safari et fonctionne comme n’importe quelle application, avec une icône sur l’écran d’accueil et des notifications.</p>
+  <p class="note" id="iab-note" hidden>Ouvrez d’abord cette page dans <b>Safari</b> : appuyez sur ⋯ puis « Ouvrir dans Safari ».</p>
+  <ol>
+    <li>Ouvrez <a href="fr.html">Kolicar</a> dans Safari.</li>
+    <li>Appuyez sur le bouton Partager <svg class="share-ic" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3.5v11"/><path d="M8 7.5l4-4 4 4"/><path d="M8 10.5H6.5A1.5 1.5 0 0 0 5 12v7a1.5 1.5 0 0 0 1.5 1.5h11A1.5 1.5 0 0 0 19 19v-7a1.5 1.5 0 0 0-1.5-1.5H16"/></svg>. Sur iOS 26, il se trouve derrière <b>⋯</b> à côté de la barre d’adresse.</li>
+    <li>Faites défiler la liste et choisissez « Sur l’écran d’accueil ». Laissez « Ouvrir comme app web » activé s’il apparaît, puis appuyez sur « Ajouter ».</li>
+    <li>Ouvrez Kolicar depuis sa nouvelle icône, puis appuyez sur « Activer les notifications » et « Autoriser ».</li>
+  </ol>
+  <a class="btn ghost" href="fr.html">Ouvrir Kolicar</a>
+  <p class="hint">Les notifications nécessitent iOS 16.4 ou plus récent. Vous ne trouvez pas « Sur l’écran d’accueil » ? Allez en bas de la liste de partage, appuyez sur « Modifier les actions » et ajoutez-la.</p>
+</section>
+
+<div class="foot"><a href="fr.html">Ouvrir Kolicar</a><a href="terms.fr.html">Conditions d’utilisation</a><a href="privacy.fr.html">Politique de confidentialité</a><a class="lang" href="download.html" lang="ar" onclick="try{localStorage.setItem('kolicar.lang','ar')}catch(e){}">العربية</a></div>
+</main>
+<script>
+(function(){
+  var $=function(id){return document.getElementById(id)};
+  var ua=navigator.userAgent||'',ios=/iPhone|iPad|iPod/.test(ua)||(/Macintosh/.test(ua)&&(navigator.maxTouchPoints||0)>1),android=/Android/.test(ua);
+  var standalone=false;try{standalone=matchMedia('(display-mode: standalone)').matches||navigator.standalone===true||String(document.referrer).indexOf('android-app://')===0}catch(e){}
+  /* each phone sees its own way to install: the APK on Android, Safari's «إضافة إلى الشاشة الرئيسية» on iPhone */
+  if(standalone){$('in-app').hidden=false;$('apk-card').hidden=true;$('pwa-card').hidden=true;$('iphone').hidden=true}
+  else if(ios){$('apk-card').hidden=true;$('pwa-card').hidden=true;$('h1').textContent='Kolicar sur iPhone';$('for-both').hidden=true;document.title='Installer Kolicar sur iPhone';
+    if(/FBAN|FBAV|FB_IAB|Instagram|Snapchat|TikTok|musical_ly|BytedanceWebview|Line\/|GSA\//.test(ua))$('iab-note').hidden=false}
+  else if(android){$('iphone').hidden=true}
+  /* the APK is uploaded by the owner next to this page; until then, show the browser install */
+  if(window.fetch&&!standalone&&!ios){fetch('kolicar.apk',{method:'HEAD',cache:'no-store'}).then(function(r){
+    if(!r.ok){document.getElementById('apk-card').hidden=true;document.getElementById('apk-soon').hidden=false;return}
+    var n=+r.headers.get('content-length')||0;if(n>0)document.getElementById('apk-size').textContent='Taille : '+(n/1048576).toFixed(1).replace('.',',')+' Mo, pour téléphones Android.';
+  }).catch(function(){})}
+  var deferred=null,btn=document.getElementById('pwa-btn');
+  window.addEventListener('beforeinstallprompt',function(e){e.preventDefault();deferred=e;btn.hidden=false});
+  btn.addEventListener('click',function(){if(!deferred)return;deferred.prompt();deferred.userChoice.then(function(){deferred=null;btn.hidden=true})});
+  window.addEventListener('appinstalled',function(){btn.hidden=true});
+  if('serviceWorker' in navigator&&location.protocol==='https:'){try{navigator.serviceWorker.register('sw.js').catch(function(){})}catch(e){}}
+})();
+</script>
+</body>
+</html>
