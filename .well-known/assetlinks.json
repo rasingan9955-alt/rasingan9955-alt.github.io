@@ -1,1 +1,16 @@
-[{"relation":["delegate_permission/common.handle_all_urls"],"target":{"namespace":"android_app","package_name":"dz.kolicar.app","sha256_cert_fingerprints":["79:D1:5D:37:72:76:58:34:92:6F:41:0A:92:F3:08:40:4E:26:9B:B7:49:ED:6B:0F:7F:56:DA:53:F2:A7:D6:85","BA:D3:39:0A:6A:73:7B:83:4F:31:1C:C5:40:FC:5E:E1:86:2B:2E:F3:F8:22:53:54:C0:0E:17:1E:0E:F8:7A:0F"]}}]
+[
+  {
+    "relation": [
+      "delegate_permission/common.handle_all_urls"
+    ],
+    "target": {
+      "namespace": "android_app",
+      "package_name": "dz.kolicar.app",
+      "sha256_cert_fingerprints": [
+        "5E:5A:87:00:6C:8C:C3:BE:51:F6:10:56:C2:5D:AF:B5:40:EB:CF:A0:5A:1C:2B:82:A1:24:BF:EE:4F:83:B0:E8",
+        "79:D1:5D:37:72:76:58:34:92:6F:41:0A:92:F3:08:40:4E:26:9B:B7:49:ED:6B:0F:7F:56:DA:53:F2:A7:D6:85",
+        "BA:D3:39:0A:6A:73:7B:83:4F:31:1C:C5:40:FC:5E:E1:86:2B:2E:F3:F8:22:53:54:C0:0E:17:1E:0E:F8:7A:0F"
+      ]
+    }
+  }
+]
