@@ -1497,10 +1497,33 @@ function pendingList(){
   parcels().filter(isLate).forEach(p=>out.push(`<div class="card"><b>Réservation en retard : <span dir="ltr">${esc(p.code)}</span></b><span class="hint">${esc(p.driverName)} l’a réservé ${ago(p.acceptedAt||p.createdAt)} et ne l’a pas enlevé dans l’application. Il a peut-être traité avec l’expéditeur hors de l’application.</span><div class="actions"><a class="btn sm" href="tel:${esc(normPhone(p.driverPhone))}">Appeler le chauffeur</a><button class="btn sm" data-act="pdetail" data-id="${esc(p.id)}">Détails</button></div></div>`));
   return out;
 }
+/* visitors and customers, from the server's anonymous daily counter (no phone numbers, no addresses) */
+function renderAudience(){
+  const S=Store.d.stats,k=$('#a-aud-k'),s=$('#a-aud-s');if(!k)return;
+  if(!S){$('#a-aud').hidden=true;return}$('#a-aud').hidden=false;
+  const n=v=>fmtN(v||0),P=S.plat||{},tot=(P.a||0)+(P.i||0)+(P.w||0),pc=v=>tot?Math.round(100*(v||0)/tot)+'%':'—';
+  k.innerHTML=`<div class="stat hl"><span class="k">Clients ayant envoyé un colis</span><span class="v">${n(S.customers)}</span><span class="s">Nouveaux ce mois : ${n(S.custMonth)} · cette semaine : ${n(S.custWeek)}</span></div>
+    <div class="stat"><span class="k">Ont ouvert l’app aujourd’hui</span><span class="v">${n(S.today)}</span><span class="s">7 derniers jours : ${n(S.week)} · 30 derniers jours : ${n(S.month)}</span></div>
+    <div class="stat"><span class="k">Nouveaux appareils</span><span class="v">${n(S.devices)}</span><span class="s">Cette semaine : ${n(S.newWeek)} · 30 derniers jours : ${n(S.newMonth)}</span></div>
+    <div class="stat"><span class="k">Téléchargements de l’app Android</span><span class="v">${n(S.apk)}</span><span class="s">30 derniers jours : ${n(S.apkMonth)} · visites de la page de téléchargement : ${n(S.dlMonth)}</span></div>`;
+  s.textContent=`30 derniers jours par appareil : app Android ${pc(P.a)} · iPhone ${pc(P.i)} · navigateur ${pc(P.w)}. Chaque téléphone compte une fois par jour ; le compteur a démarré avec cette mise à jour.`;
+}
+/* one anonymous "opened today" per phone per day, with the kind of device and whether it is new */
+function countVisit(){
+  try{
+    if(Store.adm||!API())return;
+    const d=new Date(),day=d.getFullYear()+'-'+(d.getMonth()+1)+'-'+d.getDate();
+    if(lsGet('kolicar.seen')===day)return;
+    const isNew=lsGet('kolicar.dev')?0:1;lsSet('kolicar.dev',1);lsSet('kolicar.seen',day);
+    const u=navigator.userAgent||'',plat=isApp()&&isIOS()?'iphone':isApp()&&/Android/.test(u)?'android':'web';
+    rawCall('hit',{k:'open',plat,n:isNew}).catch(()=>{});
+  }catch(e){}
+}
 VIEWS.admin={
   html(){return `
     <section class="head"><h1>Tableau de bord</h1><p class="lead">${esc(fmtWith(dayF,Date.now()))}</p></section>
     <div id="a-kpis" class="stats"></div>
+    <section class="card" id="a-aud"><h2>Visiteurs et clients</h2><div id="a-aud-k" class="stats"></div><p class="hint" id="a-aud-s"></p></section>
     <div class="bell-slot" data-ctx="admin" data-on="hide"></div>
     <section class="card"><h2>Vos revenus des 14 derniers jours</h2><div id="a-chart"></div>
       <details class="tbl"><summary>Afficher les chiffres en tableau</summary><table><thead><tr><th>Aujourd’hui</th><th class="n">Colis enlevés</th><th class="n">Revenus</th></tr></thead><tbody id="a-table"></tbody></table></details></section>
@@ -1515,7 +1538,7 @@ VIEWS.admin={
       <div class="stat"><span class="k">Aujourd’hui</span><span class="v">${DA(sum(E.filter(x=>x.t>=d0),x=>x.v))}</span><span class="s">Nouveaux colis : ${all.filter(p=>p.createdAt>=d0&&p.status!=='cancelled').length}</span></div>
       <button class="stat" data-act="go-filter" data-r="admin-parcels" data-f="waiting"><span class="k">En attente d’un chauffeur</span><span class="v">${waiting}</span><span class="s">En cours de livraison : ${moving}</span></button>
       <button class="stat" data-act="go-filter" data-r="admin-drivers" data-f="${pend?'pending':'all'}"><span class="k">Chauffeurs vérifiés</span><span class="v">${ver.length}</span><span class="s">${pend?`En vérification : ${pend}`:'Aucune nouvelle demande'}</span></button>`;
-    renderChart(E);
+    renderChart(E);renderAudience();
     const items=pendingList();$('#a-pcount').textContent=items.length?String(items.length):'';
     $('#a-pending').innerHTML=items.length?items.join(''):`<div class="empty">Rien ne vous attend pour l’instant.</div>`;
     const low=ver.filter(d=>needsPay(d.id)),M=monthly();
@@ -1867,6 +1890,7 @@ function start(){
   /* the notification worker shows text in this page's language */
   try{if(window.caches)caches.open('kolicar-meta').then(c=>c.put(new URL('__kolicar_lang',location.href).href,new Response(LANG))).catch(()=>{})}catch(e){}
   firstLoad();
+  setTimeout(countVisit,2500);
 }
 start();
 </script>

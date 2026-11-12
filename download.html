@@ -96,6 +96,7 @@ a{color:var(--primary)}
 
 <div class="foot"><a href="./">افتح كوليكار</a><a href="terms.html">شروط الاستعمال</a><a href="privacy.html">سياسة الخصوصية</a><a class="lang" href="download.fr.html" lang="fr" onclick="try{localStorage.setItem('kolicar.lang','fr')}catch(e){}">Français</a></div>
 </main>
+<script src="config.js"></script>
 <script>
 (function(){
   var $=function(id){return document.getElementById(id)};
@@ -106,6 +107,11 @@ a{color:var(--primary)}
   else if(ios){$('apk-card').hidden=true;$('pwa-card').hidden=true;$('h1').textContent='كوليكار على iPhone';$('for-both').hidden=true;document.title='ثبّت كوليكار على iPhone';
     if(/FBAN|FBAV|FB_IAB|Instagram|Snapchat|TikTok|musical_ly|BytedanceWebview|Line\/|GSA\//.test(ua))$('iab-note').hidden=false}
   else if(android){$('iphone').hidden=true}
+  /* anonymous counter for the owner: page visits and APK downloads (no personal data) */
+  function hit(k){try{var u=String((window.KOLICAR||{}).api||'');if(!/^(https:|http:\/\/127\.0\.0\.1:)/.test(u))return;var b=JSON.stringify({action:'hit',p:{k:k,plat:standalone?(ios?'iphone':'android'):'web'}});
+    if(navigator.sendBeacon&&navigator.sendBeacon(u,new Blob([b],{type:'text/plain;charset=utf-8'})))return;fetch(u,{method:'POST',mode:'no-cors',keepalive:true,headers:{'Content-Type':'text/plain;charset=utf-8'},body:b})}catch(e){}}
+  hit('dl');
+  try{$('apk-btn').addEventListener('click',function(){hit('apk')})}catch(e){}
   /* the APK is uploaded by the owner next to this page; until then, show the browser install */
   if(window.fetch&&!standalone&&!ios){fetch('kolicar.apk',{method:'HEAD',cache:'no-store'}).then(function(r){
     if(!r.ok){document.getElementById('apk-card').hidden=true;document.getElementById('apk-soon').hidden=false;return}

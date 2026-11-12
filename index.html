@@ -1497,10 +1497,33 @@ function pendingList(){
   parcels().filter(isLate).forEach(p=>out.push(`<div class="card"><b>حجز متأخر: <span dir="ltr">${esc(p.code)}</span></b><span class="hint">${esc(p.driverName)} حجزه ${ago(p.acceptedAt||p.createdAt)} ولم يستلمه في التطبيق. قد يكون تعامل مع المرسل خارج التطبيق.</span><div class="actions"><a class="btn sm" href="tel:${esc(normPhone(p.driverPhone))}">اتصل بالسائق</a><button class="btn sm" data-act="pdetail" data-id="${esc(p.id)}">التفاصيل</button></div></div>`));
   return out;
 }
+/* visitors and customers, from the server's anonymous daily counter (no phone numbers, no addresses) */
+function renderAudience(){
+  const S=Store.d.stats,k=$('#a-aud-k'),s=$('#a-aud-s');if(!k)return;
+  if(!S){$('#a-aud').hidden=true;return}$('#a-aud').hidden=false;
+  const n=v=>fmtN(v||0),P=S.plat||{},tot=(P.a||0)+(P.i||0)+(P.w||0),pc=v=>tot?Math.round(100*(v||0)/tot)+'%':'—';
+  k.innerHTML=`<div class="stat hl"><span class="k">زبائن أرسلوا طرداً</span><span class="v">${n(S.customers)}</span><span class="s">جدد هذا الشهر: ${n(S.custMonth)} · هذا الأسبوع: ${n(S.custWeek)}</span></div>
+    <div class="stat"><span class="k">فتحوا التطبيق اليوم</span><span class="v">${n(S.today)}</span><span class="s">آخر 7 أيام: ${n(S.week)} · آخر 30 يوماً: ${n(S.month)}</span></div>
+    <div class="stat"><span class="k">أجهزة جديدة</span><span class="v">${n(S.devices)}</span><span class="s">هذا الأسبوع: ${n(S.newWeek)} · آخر 30 يوماً: ${n(S.newMonth)}</span></div>
+    <div class="stat"><span class="k">تحميلات تطبيق أندرويد</span><span class="v">${n(S.apk)}</span><span class="s">آخر 30 يوماً: ${n(S.apkMonth)} · زيارات صفحة التحميل: ${n(S.dlMonth)}</span></div>`;
+  s.textContent=`آخر 30 يوماً حسب الجهاز: تطبيق أندرويد ${pc(P.a)} · iPhone ${pc(P.i)} · المتصفح ${pc(P.w)}. كل هاتف يُحسب مرة واحدة في اليوم، والعدّاد بدأ يوم تحديث التطبيق.`;
+}
+/* one anonymous "opened today" per phone per day, with the kind of device and whether it is new */
+function countVisit(){
+  try{
+    if(Store.adm||!API())return;
+    const d=new Date(),day=d.getFullYear()+'-'+(d.getMonth()+1)+'-'+d.getDate();
+    if(lsGet('kolicar.seen')===day)return;
+    const isNew=lsGet('kolicar.dev')?0:1;lsSet('kolicar.dev',1);lsSet('kolicar.seen',day);
+    const u=navigator.userAgent||'',plat=isApp()&&isIOS()?'iphone':isApp()&&/Android/.test(u)?'android':'web';
+    rawCall('hit',{k:'open',plat,n:isNew}).catch(()=>{});
+  }catch(e){}
+}
 VIEWS.admin={
   html(){return `
     <section class="head"><h1>لوحة التحكم</h1><p class="lead">${esc(fmtWith(dayF,Date.now()))}</p></section>
     <div id="a-kpis" class="stats"></div>
+    <section class="card" id="a-aud"><h2>الزوار والزبائن</h2><div id="a-aud-k" class="stats"></div><p class="hint" id="a-aud-s"></p></section>
     <div class="bell-slot" data-ctx="admin" data-on="hide"></div>
     <section class="card"><h2>دخلك في آخر 14 يوماً</h2><div id="a-chart"></div>
       <details class="tbl"><summary>عرض الأرقام كجدول</summary><table><thead><tr><th>اليوم</th><th class="n">طرود استُلمت</th><th class="n">الدخل</th></tr></thead><tbody id="a-table"></tbody></table></details></section>
@@ -1515,7 +1538,7 @@ VIEWS.admin={
       <div class="stat"><span class="k">اليوم</span><span class="v">${DA(sum(E.filter(x=>x.t>=d0),x=>x.v))}</span><span class="s">طرود جديدة: ${all.filter(p=>p.createdAt>=d0&&p.status!=='cancelled').length}</span></div>
       <button class="stat" data-act="go-filter" data-r="admin-parcels" data-f="waiting"><span class="k">بانتظار سائق</span><span class="v">${waiting}</span><span class="s">قيد التوصيل: ${moving}</span></button>
       <button class="stat" data-act="go-filter" data-r="admin-drivers" data-f="${pend?'pending':'all'}"><span class="k">سائقون موثّقون</span><span class="v">${ver.length}</span><span class="s">${pend?`قيد المراجعة: ${pend}`:'لا طلبات جديدة'}</span></button>`;
-    renderChart(E);
+    renderChart(E);renderAudience();
     const items=pendingList();$('#a-pcount').textContent=items.length?String(items.length):'';
     $('#a-pending').innerHTML=items.length?items.join(''):`<div class="empty">لا شيء ينتظرك الآن.</div>`;
     const low=ver.filter(d=>needsPay(d.id)),M=monthly();
@@ -1867,6 +1890,7 @@ function start(){
   /* the notification worker shows text in this page's language */
   try{if(window.caches)caches.open('kolicar-meta').then(c=>c.put(new URL('__kolicar_lang',location.href).href,new Response(LANG))).catch(()=>{})}catch(e){}
   firstLoad();
+  setTimeout(countVisit,2500);
 }
 start();
 </script>
